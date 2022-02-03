@@ -25,5 +25,41 @@ namespace DataStructuresAndAlgorithms
             }
             return false;
         }
+        
+        //Determine whether the array has a pair of integers whose sum is equal to the sum parameter. -ve ints are allowed.
+        // O(n^2) time complexity.
+        public static bool HasPairWithSumNaive(int[] array, int sum)
+        {
+            for(var i = 0; i < array.Length; i++)
+            {
+                var elem1 = array[i];
+                for(var j = i+1; j < array.Length; j++)
+                {
+                    var elem2 = array[j];
+
+                    if (elem1 + elem2 == sum)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        //Better version of HasPairWithSumNaive.
+        // O(n) time complexity.
+        public static bool HasPairWithSumBetter(int[] array, int sum)
+        {
+            var comp = new HashSet<int>(); // set of complements.
+
+            foreach(var elem in array)
+            {
+                if (comp.Contains(elem))
+                    return true;
+                else
+                    comp.Add(sum - elem);
+            }
+
+            return false;
+        }
     }
 }

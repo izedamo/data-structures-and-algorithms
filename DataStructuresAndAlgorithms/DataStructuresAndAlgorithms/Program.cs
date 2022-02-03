@@ -6,7 +6,9 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            var result = Exercises.HaveCommonItems(new string[] {  }, new string[] {  });
+            var arr = new int[4] { 1, 2, 4, 4 };
+
+            var result = Exercises.HasPairWithSumBetter(arr, 8);
             Console.WriteLine(result);
         }
     }
