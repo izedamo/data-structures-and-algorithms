@@ -1,5 +1,8 @@
-﻿using DataStructuresAndAlgorithms.Leetcode;
+﻿using DataStructuresAndAlgorithms.DataStructures.Trees;
+using DataStructuresAndAlgorithms.Leetcode;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace DataStructuresAndAlgorithms
 {
@@ -18,6 +21,31 @@ namespace DataStructuresAndAlgorithms
 
             LeetCode.Rotate(new int[] { 1, 2, 3, 4, 5, 6, 7 }, 3);
             //Console.WriteLine(string.Join(", ", result));
+
+            //var myStack = new MyStack<int>(5);
+
+            //myStack.Push(1)
+            //       .Push(2)
+            //       .Push(3);
+
+            //Console.WriteLine(myStack.Peek());
+
+            //Console.WriteLine(myStack.Pop());
+
+            //Console.WriteLine(myStack.Peek());
+
+            var myBST = new BinarySearchTree();
+            myBST.Insert(15);
+            myBST.InsertSlightlyFaster(10);
+            myBST.Insert(20);
+            myBST.Insert(17);
+            myBST.InsertSlightlyFaster(40);
+            myBST.Insert(16);
+
+            Console.WriteLine(myBST.Lookup(40));
+            Console.WriteLine(myBST.Lookup(15));
+            Console.WriteLine(myBST.Lookup(5));
+            Console.WriteLine(myBST.Lookup(16));
         }
     }
 }

@@ -140,10 +140,15 @@ namespace DataStructuresAndAlgorithms.Leetcode
         }
 
         //Given an array, rotate the array to the right by k steps, where k is non-negative.
+        // Time - O(n) Space - O(n)
+        // Time - O(n) Space - O(1) ... how?
         public static int[] Rotate(int[] nums, int k)
         {
             if (nums == null || nums.Length == 0 || nums.Length == 1)
                 return nums;
+
+            if (k > nums.Length)
+                k %= nums.Length;
 
             var shiftedArray = new int[nums.Length];
 
