@@ -178,7 +178,7 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
 
             if (currentNode.IsLeafNode())
             {
-                if (parentNode == null)
+                if (currentNode == Root)
                     Root = null;
                 else
                 {
