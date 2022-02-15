@@ -190,7 +190,7 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
 
             else if (currentNode.Right == null)
             {
-                if (parentNode == null)
+                if (currentNode == Root)
                     Root = currentNode.Left;
                 else
                 {
@@ -202,7 +202,7 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
 
             else if (currentNode.Left == null)
             {
-                if (parentNode == null)
+                if (currentNode == Root)
                     Root = currentNode.Right;
                 else
                 {
@@ -225,10 +225,17 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
                     successor = successor.Left;
                 }
 
-                //Point parent to successor.
-                if (parentNode.Right == currentNode)
-                    parentNode.Right = successor;
-                else parentNode.Left = successor;
+                //If node to be removed is root then set successor as root.
+                if (currentNode == Root)
+                    Root = successor;
+
+                // Else point parent to successor.
+                else
+                {
+                    if (parentNode.Right == currentNode)
+                        parentNode.Right = successor;
+                    else parentNode.Left = successor;
+                }
 
                 //Remove successor from successor's parent. Successor's parent will either have null or successor's right subtree as its new left child.
                 successorParent.Left = successor.Right;

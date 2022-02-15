@@ -35,17 +35,26 @@ namespace DataStructuresAndAlgorithms
             //Console.WriteLine(myStack.Peek());
 
             var myBST = new BinarySearchTree();
-            myBST.Insert(15);
-            myBST.InsertSlightlyFaster(10);
-            myBST.Insert(20);
-            myBST.Insert(17);
-            myBST.InsertSlightlyFaster(40);
-            myBST.Insert(16);
+            myBST.Insert(29);
+            myBST.Insert(10);
+            myBST.InsertSlightlyFaster(35);
+            myBST.InsertSlightlyFaster(30);
+            myBST.Insert(50);
+            myBST.Insert(46);
+            myBST.InsertSlightlyFaster(49);
+            myBST.Insert(47);
+            myBST.Insert(45);
+            myBST.Insert(40);
+            myBST.Insert(44);
 
             Console.WriteLine(myBST.Contains(40));
             Console.WriteLine(myBST.Contains(15));
             Console.WriteLine(myBST.Contains(5));
-            Console.WriteLine(myBST.Contains(16));
+            Console.WriteLine(myBST.Contains(35));
+
+            myBST.Remove(29);
+
+            Console.WriteLine(myBST.Contains(29));
         }
     }
 }
