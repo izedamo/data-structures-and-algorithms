@@ -42,10 +42,10 @@ namespace DataStructuresAndAlgorithms
             myBST.InsertSlightlyFaster(40);
             myBST.Insert(16);
 
-            Console.WriteLine(myBST.Lookup(40));
-            Console.WriteLine(myBST.Lookup(15));
-            Console.WriteLine(myBST.Lookup(5));
-            Console.WriteLine(myBST.Lookup(16));
+            Console.WriteLine(myBST.Contains(40));
+            Console.WriteLine(myBST.Contains(15));
+            Console.WriteLine(myBST.Contains(5));
+            Console.WriteLine(myBST.Contains(16));
         }
     }
 }
