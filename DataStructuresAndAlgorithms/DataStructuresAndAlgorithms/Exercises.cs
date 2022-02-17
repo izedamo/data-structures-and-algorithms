@@ -1,6 +1,8 @@
-﻿using System;
+﻿using DataStructuresAndAlgorithms.DataStructures.Trees;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,27 +15,27 @@ namespace DataStructuresAndAlgorithms
         {
             var hashset = new HashSet<string>(firstArray.Length); //O(1) lookup
 
-            foreach(var elem in firstArray) //O(n)
+            foreach (var elem in firstArray) //O(n)
             {
                 hashset.Add(elem);
             }
 
-            foreach(var elem in secondArray) //O(m)
+            foreach (var elem in secondArray) //O(m)
             {
                 if (hashset.Contains(elem))
                     return true;
             }
             return false;
         }
-        
+
         //Determine whether the array has a pair of integers whose sum is equal to the sum parameter. -ve ints are allowed.
         // O(n^2) time complexity.
         public static bool HasPairWithSumNaive(int[] array, int sum)
         {
-            for(var i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 var elem1 = array[i];
-                for(var j = i+1; j < array.Length; j++)
+                for (var j = i + 1; j < array.Length; j++)
                 {
                     var elem2 = array[j];
 
@@ -51,7 +53,7 @@ namespace DataStructuresAndAlgorithms
         {
             var comp = new HashSet<int>(); // set of complements.
 
-            foreach(var elem in array)
+            foreach (var elem in array)
             {
                 if (comp.Contains(elem))
                     return true;
@@ -130,6 +132,109 @@ namespace DataStructuresAndAlgorithms
                     pointer3++;
                 }
             }
+        }
+
+        //Given the root node of a complete binary tree, return its array representation.
+        public static List<int> GetArrayRepresentation(BTNode rootNode)
+        {
+            if (rootNode == null)
+                return null;
+
+            if (rootNode.Left == null && rootNode.Right == null)
+                return new List<int> { rootNode.Data };
+
+            var resultArray = new List<int>(); //Using dynamic array since nodes in tree is unknown.
+
+            var currentNode = rootNode;
+
+            //TODO: Complete this section.
+            //Q: Can we do it without recursion and queues?
+            while (currentNode != null)
+            {
+                resultArray.Add(currentNode.Data);
+
+                if (currentNode.Left != null)
+                    currentNode = currentNode.Left;
+            }
+
+            return null;
+        }
+
+        public static long GetFactorialRecursive(int num)
+        {
+            //base case. assumes factorial of negative ints as 1.
+            if (num <= 1)
+                return 1;
+
+            //recursive case. getting closer to base case by decreasing the num value each time.
+            return num * GetFactorialRecursive(num - 1);
+        }
+
+        public static long GetFactorialIterative(int num)
+        {
+            if (num <= 1)
+                return 1;
+
+            var fact = 1;
+            for (int multiplier = 2; multiplier <= num; multiplier++)
+            {
+                fact *= multiplier;
+            }
+
+            return fact;
+        }
+
+        //BADDDDD. T: O(2^n).
+        public static long GetFibonacciRecursive(int num)
+        {
+            //input validation.
+            if (num < 0)
+                return -1;
+
+            //base case.
+            if (num == 0 || num == 1)
+                return num;
+
+            //recursive case. getting closer to base case.
+            return GetFibonacciRecursive(num - 1) + GetFibonacciRecursive(num - 2);
+        }
+
+        //T: O(n).
+        //Uses BigInt since it can calculate large fib values.
+        public static BigInteger GetFibonacciIterative(int num)
+        {
+            //input validation.
+            if (num < 0)
+                return -1;
+
+            if (num == 0 || num == 1)
+                return num;
+
+            //Nth fib = (N-1)th fib + (N-2)th fib.
+
+            //we know that we have to find fib value for idx >= 2. so, we choose a starting point at idx = 3 for the loop. at which (N-1)th fib = 1 and (N-2)th fib also = 1.
+            BigInteger currentFib = 1;
+            BigInteger prevFib = 1;
+
+            for (var idx = 3; idx <= num; idx++)
+            {
+                //we calculate the Nth fib value by adding the (N-1)th and (N-2)th values and store it in currentFib. in the next iteration, currentFib becomes the (N-1)the value and prevFib becomes (N-2)th value as we exchange their values in the previous iteration.
+                var tmp = currentFib;
+                currentFib += prevFib;
+                prevFib = tmp;
+            }
+
+            return currentFib;
+        }
+
+        public static string ReverseStringRecursive(string input)
+        {
+            //base case.
+            if (input.Length <= 1)
+                return input;
+
+            //recursive case.
+            return $"{input[^1]}{ReverseStringRecursive(input[0..^1])}";
         }
     }
 }

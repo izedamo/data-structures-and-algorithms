@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataStructuresAndAlgorithms.DataStructures.Trees
+﻿namespace DataStructuresAndAlgorithms.DataStructures.Trees
 {
     public class BTNode
     {
@@ -65,7 +59,7 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
             }
         }
 
-        //Avoids a few extra comparisons.
+        //Avoids a few extra comparisons. Better logic.
         public void InsertSlightlyFaster(int value)
         {
             var newNode = new BTNode
@@ -245,13 +239,5 @@ namespace DataStructuresAndAlgorithms.DataStructures.Trees
                 successor.Left = currentNode.Left;
             }
         }
-
-        //Get the successor of the node which has the passed value.
-        //private BTNode GetSuccessor(int value)
-        //{
-        //    var node = GetNodeWithValue(value);
-
-
-        //}
     }
 }
