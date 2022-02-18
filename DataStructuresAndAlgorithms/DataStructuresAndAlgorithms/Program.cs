@@ -11,7 +11,12 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Exercises.ReverseStringRecursive("yoyo mastery"));
+            //var arr = new int[] { 1, -8, 2, 5, 10, 3 };
+            var list = new List<int> { 3, 0, 1, 8, 7, 2, 5, 4, 9, 6 };
+            Exercises.InsertionSort(list);
+            Console.WriteLine(string.Join(", ", list));
+
+            //Console.WriteLine(Exercises.ReverseStringRecursive("yoyo mastery"));
 
             //Console.WriteLine(Exercises.GetFibonacciIterative(100));
 

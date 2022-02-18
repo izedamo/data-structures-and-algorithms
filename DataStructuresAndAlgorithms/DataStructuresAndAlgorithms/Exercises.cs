@@ -236,5 +236,88 @@ namespace DataStructuresAndAlgorithms
             //recursive case.
             return $"{input[^1]}{ReverseStringRecursive(input[0..^1])}";
         }
+
+        //sorts in place. T: O(n^2), S: O(1).
+        public static void BubbleSort(int[] arrayToBeSorted)
+        {
+            if (arrayToBeSorted == null || arrayToBeSorted.Length == 1 || arrayToBeSorted.Length == 0)
+                return;
+
+            //For bubble sort we need outer passes to be the length of the array.
+            var passesRemaining = arrayToBeSorted.Length;
+
+            //For the last pass, we don't need to do anything since only 1 elem remains to be sorted and since all other elems are already sorted this elem would be at its correct place already.
+            while (passesRemaining > 1)
+            {
+                var prevIdx = 0;
+
+                //For the 1st pass, we need to go till the end of array(N-1) to bubble out the largest elem. For the 2nd pass, we need to go till 2nd last of array i.e., N-2th idx only since after that all elems are already sorted. Incidentally, the idx till which we need to go = passesRemaining - 1.
+                for (var idx = 1; idx < passesRemaining; idx++)
+                {
+                    if (arrayToBeSorted[prevIdx] > arrayToBeSorted[idx])
+                    {
+                        var tmp = arrayToBeSorted[idx];
+                        arrayToBeSorted[idx] = arrayToBeSorted[prevIdx];
+                        arrayToBeSorted[prevIdx] = tmp;
+                    }
+
+                    prevIdx = idx;
+                }
+
+                passesRemaining--;
+            }
+        }
+
+        //sorts in place. T: O(n^2), S: O(1).
+        public static void SelectionSort(int[] arrayToBeSorted)
+        {
+            if (arrayToBeSorted == null || arrayToBeSorted.Length == 1 || arrayToBeSorted.Length == 0)
+                return;
+
+            for (var idx = 0; idx < arrayToBeSorted.Length; idx++)
+            {
+                var red = idx;
+
+                for (var blue = idx + 1; blue < arrayToBeSorted.Length; blue++)
+                {
+                    if (arrayToBeSorted[red] > arrayToBeSorted[blue])
+                        red = blue;
+                }
+
+                if (red != idx)
+                {
+                    var tmp = arrayToBeSorted[idx];
+                    arrayToBeSorted[idx] = arrayToBeSorted[red];
+                    arrayToBeSorted[red] = tmp;
+                }
+            }
+        }
+
+        //works by inserting each element in its correct position. best T: O(n), worst T: O(n^2). S: O(1)
+        public static void InsertionSort(List<int> nums)
+        {
+            if (nums == null || nums.Count == 0 || nums.Count == 1)
+                return;
+
+            //loop over nums to find correct elem for each idx.
+            for (var idx = 1; idx < nums.Count; idx++)
+            {
+                //we only need to do something if the current element is less than the largest elem in the already sorted sublist.
+                if (nums[idx] < nums[idx - 1])
+                {
+                    var replaceIdx = idx;
+
+                    //we will start pushing the current element to its correct position in the sorted sublist. we keep in mind that when the sorted list has size 1 then we must avoid out of range scenario.
+                    while(replaceIdx >= 1 && nums[replaceIdx-1] > nums[replaceIdx])
+                    {
+                        var tmp = nums[replaceIdx - 1];
+                        nums[replaceIdx - 1] = nums[replaceIdx];
+                        nums[replaceIdx] = tmp;
+
+                        replaceIdx--;
+                    }
+                }
+            }
+        }
     }
 }
