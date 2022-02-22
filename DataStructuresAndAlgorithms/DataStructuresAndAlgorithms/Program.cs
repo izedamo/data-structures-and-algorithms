@@ -11,10 +11,36 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
+            var arr = new int[] { 1, -8, 2, 5, 10, 3 };
+            Console.WriteLine(string.Join(", ", Exercises.MergeSort(arr)));
+
+            //var board = new char[][]
+            //{
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'},
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'},
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'},
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'},
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'},
+            //    new char[]{'a', 'a', 'a', 'a', 'a', 'a'}
+            //};
+
+            //var board2 = new char[][]
+            //{
+            //    new char[]{'A'}
+            //};
+
+            //Console.WriteLine(LeetCode.ExistRecursive(board, "aaaaaaaxaaaaaaa"));
+
+            //Console.WriteLine(LeetCode.IsAnagram("tea", "eat"));
+
+            //var boxes = new int[][] { new int[] { 1, 3 }, new int[] { 2, 2 }, new int[] { 3, 1 } };
+
+            //Console.WriteLine(LeetCode.MaximumUnits(boxes, 4));
+
             //var arr = new int[] { 1, -8, 2, 5, 10, 3 };
-            var list = new List<int> { 3, 0, 1, 8, 7, 2, 5, 4, 9, 6 };
-            Exercises.InsertionSort(list);
-            Console.WriteLine(string.Join(", ", list));
+            //var list = new List<int> { 3, 0, 1, 8, 7, 2, 5, 4, 9, 6 };
+            //Exercises.InsertionSort(list);
+            //Console.WriteLine(string.Join(", ", list));
 
             //Console.WriteLine(Exercises.ReverseStringRecursive("yoyo mastery"));
 

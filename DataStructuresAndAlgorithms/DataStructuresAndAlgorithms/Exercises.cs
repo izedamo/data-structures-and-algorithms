@@ -319,5 +319,89 @@ namespace DataStructuresAndAlgorithms
                 }
             }
         }
+
+        public static int[] MergeSort(int[] nums)
+        {
+            //validations.
+            if (nums == null || nums.Length == 1)
+                return nums;
+            
+            //base case.
+            if(nums.Length == 2)
+            {
+                if (nums[0] > nums[1])
+                    return new int[] { nums[1], nums[0] };
+                else
+                    return nums;
+            }
+
+            //recursive case.
+            var mid = nums.Length / 2;
+
+            //sort left half of array.
+            int[] leftHalf = new int[mid];
+            Array.Copy(nums, 0, leftHalf, 0, mid);
+            leftHalf = MergeSort(leftHalf);
+
+            //sort right half of array.
+            int[] rightHalf = new int[nums.Length - mid];
+            Array.Copy(nums, mid, rightHalf, 0, nums.Length - mid);
+            rightHalf = MergeSort(rightHalf);
+
+            //merge sorted halves.
+            var sortedNums = new int[nums.Length];
+            var ptrSortedNums = 0;
+            var ptrLeftHalf = 0;
+            var ptrRightHalf = 0;
+
+            void AddRemainingNumsToArray(bool isRightHalfRemaining = false)
+            {
+                var remainingNums = leftHalf;
+                var remainingPtr = ptrLeftHalf;
+                if (isRightHalfRemaining)
+                {
+                    remainingNums = rightHalf;
+                    remainingPtr = ptrRightHalf;
+                }
+
+                while (remainingPtr < remainingNums.Length)
+                {
+                    sortedNums[ptrSortedNums] = remainingNums[remainingPtr];
+                    remainingPtr++;
+                    ptrSortedNums++;
+                }
+            }
+
+            while(ptrLeftHalf < leftHalf.Length && ptrRightHalf < rightHalf.Length)
+            {
+                if(leftHalf[ptrLeftHalf] <= rightHalf[ptrRightHalf])
+                {
+                    sortedNums[ptrSortedNums] = leftHalf[ptrLeftHalf];
+                    ptrLeftHalf++;
+                }
+                else
+                {
+                    sortedNums[ptrSortedNums] = rightHalf[ptrRightHalf];
+                    ptrRightHalf++;
+                }
+                ptrSortedNums++;
+            }
+
+            if(ptrLeftHalf == leftHalf.Length)
+            {
+                AddRemainingNumsToArray(true);
+            }
+            else
+            {
+                AddRemainingNumsToArray();
+            }
+
+            return sortedNums;
+        }
+
+        public static void QuickSort(int[] nums)
+        {
+
+        }
     }
 }

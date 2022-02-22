@@ -358,8 +358,277 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             if (movesRemaining > 0)
                 return "Pending";
-            
+
             else return "Draw";
+        }
+
+        public static int MaximumUnits(int[][] boxTypes, int truckSize)
+        {
+            if (truckSize == 0 || boxTypes == null || boxTypes.Length == 0)
+                return 0;
+
+            var maxUnits = 0;
+
+            var comparator = Comparer<int>.Default;
+
+            Array.Sort(boxTypes, (b1, b2) => comparator.Compare(b2[1], b1[1]));
+
+            var currentBoxType = 0;
+
+            while (truckSize > 0 && currentBoxType < boxTypes.Length)
+            {
+                var boxesAvailable = boxTypes[currentBoxType][0];
+                var unitsPerBox = boxTypes[currentBoxType][1];
+
+                if (truckSize >= boxesAvailable)
+                {
+                    maxUnits += boxesAvailable * unitsPerBox;
+                    truckSize -= boxesAvailable;
+                    currentBoxType++;
+                }
+
+                else
+                {
+                    maxUnits += truckSize * unitsPerBox;
+                    truckSize = 0;
+                }
+            }
+
+            return maxUnits;
+        }
+
+        public static bool IsAnagram(string s, string t)
+        {
+            if (s == null || t == null)
+                return false;
+
+            if (s.Length != t.Length)
+                return false;
+
+            var sLetters = GetLettersDict(s);
+            var tLetters = GetLettersDict(t);
+
+            if (sLetters.Count != tLetters.Count) return false;
+
+            foreach (var kv in sLetters)
+            {
+                if (!tLetters.ContainsKey(kv.Key) || kv.Value != tLetters[kv.Key])
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static Dictionary<char, int> GetLettersDict(string input)
+        {
+            var letters = new Dictionary<char, int>();
+
+            foreach (var chr in input)
+            {
+                if (letters.ContainsKey(chr))
+                    letters[chr]++;
+                else
+                    letters.Add(chr, 1);
+            }
+
+            return letters;
+        }
+
+        //Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+        public static int[][] Merge(int[][] intervals)
+        {
+            if (intervals == null || intervals.Length == 1)
+                return intervals;
+
+            //O(n log n) sort.
+            var comparator = Comparer<int>.Default;
+
+            Array.Sort(intervals, (a, b) => comparator.Compare(a[0], b[0]));
+
+            var mergedIntervals = new List<int[]>();
+
+            var mergedInterval = intervals[0];
+            var arrayPointer = 1;
+
+            while (arrayPointer < intervals.Length)
+            {
+                var currentInterval = intervals[arrayPointer];
+                if (CanMerge(mergedInterval, currentInterval))
+                {
+                    mergedInterval = DoMerge(mergedInterval, currentInterval);
+                }
+                else
+                {
+                    mergedIntervals.Add(mergedInterval);
+                    mergedInterval = currentInterval;
+                }
+
+                arrayPointer++;
+            }
+
+            mergedIntervals.Add(mergedInterval);
+
+            return mergedIntervals.ToArray();
+        }
+
+        private static bool CanMerge(int[] firstArray, int[] secondArray)
+        {
+            return secondArray[0] <= firstArray[1];
+        }
+
+        private static int[] DoMerge(int[] firstArray, int[] secondArray)
+        {
+            return new int[2] { firstArray[0], Math.Max(firstArray[1], secondArray[1]) };
+        }
+
+        //Given an m x n grid of characters board and a string word, return true if word exists in the grid.
+        //The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.The same letter cell may not be used more than once.
+        // This solution is TLE :|
+        public static bool Exist(char[][] board, string word)
+        {
+            //validations.
+            if (board == null || board.Length == 0 || word == null || word.Length == 0 || word.Length > board.Length * board[0].Length)
+                return false;
+
+            var lastRowIdx = board.Length - 1;
+            var lastColIdx = board[0].Length - 1;
+
+            var charsInBoard = new HashSet<char>();
+
+            for(var i = 0; i <= lastRowIdx; i++)
+            {
+                for(var j = 0; j <= lastColIdx; j++)
+                {
+                    charsInBoard.Add(board[i][j]);
+                }
+            }
+
+            foreach(var chr in word)
+            {
+                if (!charsInBoard.Contains(chr))
+                    return false;
+            }
+
+            for(var i = 0; i <= lastRowIdx; i++)
+            {
+                for(var j = 0; j <= lastColIdx; j++)
+                {
+                    if(board[i][j] == word[0])
+                    {
+                        var currentSubStr = new Stack<int[]>();
+                        var visitedPositions = new Dictionary<int[], HashSet<string>>();
+                        var usedCharPostions = new HashSet<string>(word.Length);
+
+                        currentSubStr.Push(new int[] { i, j });
+                        usedCharPostions.Add($"{i}:{j}");
+
+                        var ptr = 1;
+
+                        while(currentSubStr.Count != 0 && ptr < word.Length)
+                        {
+                            var nextChar = word[ptr];
+                            var position = currentSubStr.Peek();
+                            var row = position[0]; var col = position[1];
+
+                            var belowRow = row + 1;
+                            var aboveRow = row - 1;
+                            var previousCol = col - 1;
+                            var nextCol = col + 1;
+
+                            if (!visitedPositions.ContainsKey(position))
+                                visitedPositions.Add(position, new HashSet<string>(4));
+
+                            if (belowRow <= lastRowIdx && !usedCharPostions.Contains($"{belowRow}:{col}") && !visitedPositions[position].Contains($"{belowRow}:{col}") && board[belowRow][col] == nextChar)
+                            {
+                                currentSubStr.Push(new int[] { belowRow, col });
+                                usedCharPostions.Add($"{belowRow}:{col}");
+                                visitedPositions[position].Add($"{belowRow}:{col}");
+                                ptr++;
+                            }
+
+                            else if (aboveRow >= 0 && !usedCharPostions.Contains($"{aboveRow}:{col}") && !visitedPositions[position].Contains($"{aboveRow}:{col}") &&  board[aboveRow][col] == nextChar)
+                            {
+                                currentSubStr.Push(new int[] { aboveRow, col });
+                                usedCharPostions.Add($"{aboveRow}:{col}");
+                                visitedPositions[position].Add($"{aboveRow}:{col}");
+                                ptr++;
+                            }
+
+                            else if (previousCol >= 0 && !usedCharPostions.Contains($"{row}:{previousCol}") && !visitedPositions[position].Contains($"{row}:{previousCol}")  && board[row][previousCol] == nextChar)
+                            {
+                                currentSubStr.Push(new int[] { row, previousCol });
+                                usedCharPostions.Add($"{row}:{previousCol}");
+                                visitedPositions[position].Add($"{row}:{previousCol}");
+                                ptr++;
+                            }
+
+                            else if (nextCol <= lastColIdx && !usedCharPostions.Contains($"{row}:{nextCol}") && !visitedPositions[position].Contains($"{row}:{nextCol}") && board[row][nextCol] == nextChar)
+                            {
+                                currentSubStr.Push(new int[] { row, nextCol });
+                                usedCharPostions.Add($"{row}:{nextCol}");
+                                visitedPositions[position].Add($"{row}:{nextCol}");
+                                ptr++;
+                            }
+
+                            //no connection found
+                            else
+                            {
+                                currentSubStr.Pop();
+                                usedCharPostions.Remove($"{row}:{col}");
+                                ptr--;
+                            }
+                        }
+
+                        if (ptr == word.Length)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        //Given an m x n grid of characters board and a string word, return true if word exists in the grid.
+        //The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.The same letter cell may not be used more than once.
+        public static bool ExistRecursive(char[][] board, string word)
+        {
+            //do validations.
+
+            var usedPositions = new HashSet<string>();
+            var lastRowIdx = board.Length - 1;
+            var lastColIdx = board[0].Length - 1;
+
+            bool FindWord(int row, int col, int wordPtr)
+            {
+                //base case.
+                if (wordPtr == word.Length)
+                    return true;
+
+                var currentPosition = $"{row}:{col}";
+
+                //invalid indices
+                if (row > lastRowIdx || col > lastColIdx || row < 0 || col < 0 || board[row][col] != word[wordPtr] || usedPositions.Contains(currentPosition))
+                    return false;
+
+                usedPositions.Add(currentPosition);
+
+                if (FindWord(row - 1, col, wordPtr + 1) || FindWord(row + 1, col, wordPtr + 1) || FindWord(row, col - 1, wordPtr + 1) || FindWord(row, col + 1, wordPtr + 1))
+                    return true;
+
+                usedPositions.Remove(currentPosition);
+                return false;
+            }
+
+            for (var row = 0; row <= lastRowIdx; row++)
+            {
+                for(var col = 0; col <= lastColIdx; col++)
+                {
+                    if (FindWord(row, col, 0))
+                        return true;
+                }
+            }
+
+            return false;
         }
     }
 }
