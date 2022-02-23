@@ -11,8 +11,29 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            var arr = new int[] { 1, -8, 2, 5, 10, 3 };
-            Console.WriteLine(string.Join(", ", Exercises.MergeSort(arr)));
+            var myHeap = new MyMinHeap();
+
+            myHeap.Push(10);
+            myHeap.Push(20);
+            myHeap.Push(30);
+            myHeap.Push(40);
+            myHeap.Push(100);
+            myHeap.Push(80);
+            myHeap.Push(90);
+            myHeap.Push(50);
+
+            myHeap.Pop();
+            myHeap.Pop();
+
+            Console.WriteLine(string.Join(", ", myHeap.GetHeapElements()));
+
+            //var grid = new char[][]
+            //{new char[] {'1','1','1','1','1','0','1','1','1','1','1','1','1','1','1','0','1','0','1','1'},new char[] {'0','1','1','1','1','1','1','1','1','1','1','1','1','0','1','1','1','1','1','0'},new char[] {'1','0','1','1','1','0','0','1','1','0','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','0','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','0','0','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','0','1','1','1','1','1','1','0','1','1','1','0','1','1','1','0','1','1','1'},new char[] {'0','1','1','1','1','1','1','1','1','1','1','1','0','1','1','0','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','0','1','1','1','1','0','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','0','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'0','1','1','1','1','1','1','1','0','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','0','1','1','1','1','1','1','1','0','1','1','1','1','1','1'},new char[] {'1','0','1','1','1','1','1','0','1','1','1','0','1','1','1','1','0','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','0','1','1','1','1','1','1','0'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','0','1','1','1','1','0','0'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'},new char[] {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'}};
+
+            //Console.WriteLine(LeetCode.NumIslands(grid));
+
+            //var arr = new int[] { 1, -8, 2, 5, 10, 3 };
+            //Console.WriteLine(string.Join(", ", Exercises.MergeSort(arr)));
 
             //var board = new char[][]
             //{
@@ -99,17 +120,15 @@ namespace DataStructuresAndAlgorithms
             //Console.WriteLine(myStack.Peek());
 
             //var myBST = new BinarySearchTree();
-            //myBST.Insert(29);
-            //myBST.Insert(10);
-            //myBST.InsertSlightlyFaster(35);
-            //myBST.InsertSlightlyFaster(30);
-            //myBST.Insert(50);
-            //myBST.Insert(46);
-            //myBST.InsertSlightlyFaster(49);
-            //myBST.Insert(47);
-            //myBST.Insert(45);
-            //myBST.Insert(40);
-            //myBST.Insert(44);
+            //myBST.Insert(9);
+            //myBST.Insert(4);
+            //myBST.InsertSlightlyFaster(20);
+            //myBST.InsertSlightlyFaster(1);
+            //myBST.Insert(6);
+            //myBST.Insert(15);
+            //myBST.InsertSlightlyFaster(170);
+
+            //Console.WriteLine(string.Join(", ", myBST.DFSPostOrder()));
 
             //Console.WriteLine(myBST.Contains(40));
             //Console.WriteLine(myBST.Contains(15));

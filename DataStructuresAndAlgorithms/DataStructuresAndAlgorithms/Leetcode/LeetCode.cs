@@ -630,5 +630,66 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             return false;
         }
+
+        //Leetcode - 200
+        //Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.
+        //An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.You may assume all four edges of the grid are all surrounded by water.
+        //BFS - Naive Approach. Leads to TLE.
+        public static int NumIslands(char[][] grid)
+        {
+            //do validations.
+            if (grid == null || grid.Length == 0)
+                return 0;
+
+            var lastRow = grid.Length - 1;
+            var lastCol = grid[0].Length - 1;
+
+            var partOfExistingIslands = new HashSet<string>();
+            var numOfIslands = 0;
+
+            bool ShouldProcessNum(int row, int col)
+            {
+                var num = grid[row][col];
+
+                return num == '1' && !partOfExistingIslands.Contains($"{row}:{col}");
+            }
+
+            void AddNeighborToQueue(int row, int col, Queue<int[]> queue)
+            {
+                if (row < 0 || row > lastRow || col < 0 || col > lastCol)
+                    return;
+
+                if (ShouldProcessNum(row, col))
+                    queue.Enqueue(new int[] { row, col });
+            }
+
+            for(var row = 0; row <= lastRow; row++)
+            {
+                for(var col = 0; col <= lastCol; col++)
+                {
+                    if(ShouldProcessNum(row, col))
+                    {
+                        var numsToProcess = new Queue<int[]>();
+                        numsToProcess.Enqueue(new int[] { row, col });
+
+                        numOfIslands++;
+
+                        while(numsToProcess.Count > 0)
+                        {
+                            var position = numsToProcess.Dequeue();
+
+                            partOfExistingIslands.Add($"{position[0]}:{position[1]}");
+
+                            AddNeighborToQueue(position[0] + 1, position[1], numsToProcess);
+                            AddNeighborToQueue(position[0] - 1, position[1], numsToProcess);
+                            AddNeighborToQueue(position[0], position[1] + 1, numsToProcess);
+                            AddNeighborToQueue(position[0], position[1] - 1, numsToProcess);
+                        }
+                    }
+                }
+            }
+
+            return numOfIslands;
+        }
     }
 }
