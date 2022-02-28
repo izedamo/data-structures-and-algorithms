@@ -691,5 +691,204 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             return numOfIslands;
         }
+
+        public static int NumIslands2(char[][] grid)
+        {
+            //validations
+            if (grid == null || grid.Length == 0 || grid[0].Length == 0)
+                return 0;
+
+            var lastRow = grid.Length - 1;
+            var lastCol = grid[0].Length - 1;
+
+            var numOfIslands = 0;
+
+            var visited = new HashSet<(int, int)>();
+
+            //utility function.
+            void AddNeighborToQueue(int r, int c, Queue<(int, int)> queue)
+            {
+                if (r >= 0 && r <= lastRow && c >= 0 && c <= lastCol && grid[r][c] == '1' && !visited.Contains((r, c)))
+                {
+                    visited.Add((r, c));
+                    queue.Enqueue((r, c));
+                }
+            }
+
+            //iterate over grid to find the islands.
+            for (var row = 0; row <= lastRow; row++)
+            {
+                for (var col = 0; col <= lastCol; col++)
+                {
+
+                    //found an island.
+                    if (grid[row][col] == '1' && !visited.Contains((row, col)))
+                    {
+                        ++numOfIslands;
+
+                        //add all neighbors to part of island.
+                        var queue = new Queue<(int, int)>();
+
+                        queue.Enqueue((row, col));
+
+                        while (queue.Count > 0)
+                        {
+                            var node = queue.Dequeue();
+
+                            (var r, var c) = (node.Item1, node.Item2);
+
+                            //grid[r][c] = '0';
+                            visited.Add((r, c));
+
+                            AddNeighborToQueue(r + 1, c, queue);
+                            AddNeighborToQueue(r - 1, c, queue);
+                            AddNeighborToQueue(r, c + 1, queue);
+                            AddNeighborToQueue(r, c - 1, queue);
+                        }
+                    }
+                }
+            }
+
+            return numOfIslands;
+        }
+
+        public static string[] ReorderLogFiles(string[] logs)
+        {
+
+            //validations.
+            if (logs == null || logs.Length == 0 || logs.Length == 1)
+                return logs;
+
+            //final results
+            var orderedLogs = new string[logs.Length];
+
+            //will hold sorted letter logs.
+            var letterLogs = new List<string>();
+
+            //hold digit logs.
+            var digitLogs = new List<string>();
+
+            var digitSet = new HashSet<char> {
+            '0',
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9'
+        };
+
+            //letter log comparer.
+            static int CompareLogs(string log1, string log2)
+            {
+                var idx1 = log1.IndexOf(" ");
+                var idx2 = log2.IndexOf(" ");
+
+                var content1 = log1[(idx1 + 1)..];
+                var content2 = log2[(idx2 + 1)..];
+
+                var comp = content1.CompareTo(content2);
+
+                //equal strings.
+                if (comp == 0)
+                {
+                    var id1 = log1.Substring(0, idx1);
+                    var id2 = log2.Substring(0, idx2);
+
+                    return id1.CompareTo(id2);
+                }
+
+                return comp;
+            }
+
+            foreach (var log in logs)
+            {
+                var words = log.Split(' ');
+                var isDigitLog = false;
+
+                // check if it is a digit log.
+                for (var idx = 1; idx < words.Length; idx++)
+                {
+
+                    //found it is a digit log.
+                    if (digitSet.Contains(words[idx][0]))
+                    {
+                        digitLogs.Add(log);
+                        isDigitLog = true;
+                        break;
+                    }
+                }
+
+                if (!isDigitLog)
+                    letterLogs.Add(log);
+            }
+
+            letterLogs.Sort(CompareLogs);
+
+            letterLogs.CopyTo(orderedLogs, 0);
+            digitLogs.CopyTo(orderedLogs, letterLogs.Count);
+
+            return orderedLogs;
+        }
+
+        //228. Summary Ranges
+        //You are given a sorted unique integer array nums.
+        //Return the smallest sorted list of ranges that cover all the numbers in the array exactly.That is, each element of nums is covered by exactly one of the ranges, and there is no integer x such that x is in one of the ranges but not in nums.
+        //Each range[a, b] in the list should be output as:
+        //"a->b" if a != b
+        //"a" if a == b
+
+        public static IList<string> SummaryRanges(int[] nums)
+        {
+            //validation
+            if (nums == null || nums.Length == 0)
+                return new List<string>();
+
+            IList<string> ranges = new List<string>();
+
+            int prev = nums[0];
+            var range = new StringBuilder();
+            range.Append(Convert.ToString(nums[0]));
+
+            for (var idx = 1; idx < nums.Length; idx++)
+            {
+                var current = nums[idx];
+
+                //range started.
+                if (current == prev + 1)
+                {
+                    if (!range[^1].Equals('>'))
+                    {
+                        range.Append("->");
+                    }
+                }
+                //range has ended.
+                else
+                {
+                    if (range[^1].Equals('>'))
+                    {
+                        range.Append(Convert.ToString(prev));
+                    }
+
+                    ranges.Add(range.ToString());
+
+                    range.Clear();
+
+                    range.Append(Convert.ToString(current));
+                }
+
+                prev = current;
+            }
+
+            if (range[^1].Equals('>'))
+                range.Append(nums[^1]);
+
+            ranges.Add(range.ToString());
+
+            return ranges;
+        }
     }
 }
