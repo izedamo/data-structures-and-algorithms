@@ -227,6 +227,38 @@ namespace DataStructuresAndAlgorithms
             return currentFib;
         }
 
+        //Uses dynamic programming to calculate Nth fib number.
+        public static BigInteger GetFibonacciDP(int num)
+        {
+            //input validation.
+            if (num < 0)
+                return -1;
+
+            var memoizedFibs = new Dictionary<int, BigInteger>
+            {
+                { 0, 1 },
+                { 1, 1 }
+            };
+
+            //function to calculate nth fib number. uses memo.
+            BigInteger FibDP(int n)
+            {
+                if (memoizedFibs.ContainsKey(n))
+                    return memoizedFibs[n];
+
+                else
+                {
+                    //recursive case. getting closer to base case.
+                    var fib = FibDP(n - 1) + FibDP(n - 2);
+                    memoizedFibs.Add(n, fib);
+
+                    return fib;
+                }
+            }
+
+            return FibDP(num);
+        }
+
         public static string ReverseStringRecursive(string input)
         {
             //base case.
@@ -308,7 +340,7 @@ namespace DataStructuresAndAlgorithms
                     var replaceIdx = idx;
 
                     //we will start pushing the current element to its correct position in the sorted sublist. we keep in mind that when the sorted list has size 1 then we must avoid out of range scenario.
-                    while(replaceIdx >= 1 && nums[replaceIdx-1] > nums[replaceIdx])
+                    while (replaceIdx >= 1 && nums[replaceIdx - 1] > nums[replaceIdx])
                     {
                         var tmp = nums[replaceIdx - 1];
                         nums[replaceIdx - 1] = nums[replaceIdx];
@@ -325,9 +357,9 @@ namespace DataStructuresAndAlgorithms
             //validations.
             if (nums == null || nums.Length == 1)
                 return nums;
-            
+
             //base case.
-            if(nums.Length == 2)
+            if (nums.Length == 2)
             {
                 if (nums[0] > nums[1])
                     return new int[] { nums[1], nums[0] };
@@ -372,9 +404,9 @@ namespace DataStructuresAndAlgorithms
                 }
             }
 
-            while(ptrLeftHalf < leftHalf.Length && ptrRightHalf < rightHalf.Length)
+            while (ptrLeftHalf < leftHalf.Length && ptrRightHalf < rightHalf.Length)
             {
-                if(leftHalf[ptrLeftHalf] <= rightHalf[ptrRightHalf])
+                if (leftHalf[ptrLeftHalf] <= rightHalf[ptrRightHalf])
                 {
                     sortedNums[ptrSortedNums] = leftHalf[ptrLeftHalf];
                     ptrLeftHalf++;
@@ -387,7 +419,7 @@ namespace DataStructuresAndAlgorithms
                 ptrSortedNums++;
             }
 
-            if(ptrLeftHalf == leftHalf.Length)
+            if (ptrLeftHalf == leftHalf.Length)
             {
                 AddRemainingNumsToArray(true);
             }
@@ -399,9 +431,176 @@ namespace DataStructuresAndAlgorithms
             return sortedNums;
         }
 
-        public static void QuickSort(int[] nums)
+        //given an MxN grid, find the number of ways a person a can travel from top-left to bottom-right.
+        public static BigInteger GridTraveller(int m, int n)
         {
+            //store previous travel results.
+            var memo = new Dictionary<(int, int), BigInteger>
+            {
+                { (1, 1), 1 }
+            };
 
+            //memoized fn.
+            BigInteger Travel(int r, int c)
+            {
+                if (r == 0 || c == 0)
+                    return 0;
+
+                if (memo.ContainsKey((r, c)))
+                    return memo[(r, c)];
+
+                if (memo.ContainsKey((c, r)))
+                    return memo[(c, r)];
+
+                var ways = Travel(r - 1, c) + Travel(r, c - 1);
+
+                memo.Add((r, c), ways);
+
+                return memo[(r, c)];
+            }
+
+            return Travel(m, n);
+        }
+
+        //given a target sum and a list of non-negative integers, determine(true/false) whether the sum can be achieved by using numbers from the list.
+        //use dynamic programming.
+        public static bool CanSum(int targetSum, int[] nums)
+        {
+            //validations
+            if (nums == null || nums.Length == 0)
+                return false;
+
+            var memo = new Dictionary<int, bool>();
+
+            bool CanSum(int target)
+            {
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                //base case.
+                if (target < 0)
+                    return false;
+                if (target == 0)
+                    return true;
+
+                //recursive case.
+                //we check if the remaining sum can be obtained by adding nums from the list by subtracting a num from the target.
+                foreach (var num in nums)
+                {
+                    //target can be reached by adding num multiple times.
+                    //if (target % num == 0)
+                    //{
+                    //    memo.Add(target, true);
+                    //    return memo[target];
+                    //}
+
+                    var newTarget = target - num;
+
+                    if (CanSum(newTarget))
+                    {
+                        memo.Add(newTarget, true);
+                        return memo[newTarget];
+                    }
+                }
+
+                memo.Add(target, false);
+                return memo[target];
+            }
+
+            return CanSum(targetSum);
+        }
+
+        //given a target sum and a list of nums, return a list of nums that add upto the target sum. if target cannot be achieved then return null.
+        public static List<int> HowSum(int targetSum, int[] nums)
+        {
+            //validations
+            if (nums == null || nums.Length == 0)
+                return null;
+
+            var memo = new Dictionary<int, bool>();
+            var answer = new List<int>();
+
+            //recursive fn.
+            bool HowSum(int target)
+            {
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                if (target == 0)
+                    return true;
+                if (target < 0)
+                {
+                    if (answer.Count > 0)
+                        answer.RemoveAt(answer.Count - 1);
+                    return false;
+                }
+
+                foreach (var num in nums)
+                {
+                    if (HowSum(target - num))
+                    {
+                        memo.Add(target - num, true);
+                        answer.Add(num);
+                        return memo[target - num];
+                    }
+                }
+
+                if (answer.Count > 0)
+                    answer.RemoveAt(answer.Count - 1);
+                memo.Add(target, false);
+                return memo[target];
+            }
+
+            HowSum(targetSum);
+
+            return answer.Count > 0 ? answer : null;
+        }
+
+        //given a target sum and a list of nums, return the SHORTEST combination of nums that add upto the target sum. if target cannot be achieved then return null.
+        public static List<int> BestSum(int targetSum, int[] nums)
+        {
+            //do validations here.
+
+            List<int> bestSum(int target, Dictionary<int, List<int>> memo)
+            {
+                //initialize memo if not passed.
+                if (memo == null)
+                    memo = new Dictionary<int, List<int>>();
+
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                //base case.
+                if (target == 0)
+                    return new List<int>();
+                if (target < 0)
+                    return null;
+
+                List<int> shortestCombination = null;
+                foreach (var num in nums)
+                {
+                    var remainder = target - num;
+                    var remainderList = bestSum(remainder, memo);
+
+                    if (remainderList != null)
+                    {
+                        var combination = new List<int>(remainderList)
+                        {
+                            num
+                        };
+
+                        if (shortestCombination == null || combination.Count < shortestCombination.Count)
+                        {
+                            shortestCombination = combination;
+                        }
+                    }
+                }
+
+                memo.Add(target, shortestCombination);
+                return shortestCombination;
+            }
+
+            return bestSum(targetSum, null);
         }
     }
 }

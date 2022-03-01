@@ -11,7 +11,9 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(LeetCode.SummaryRanges(new int[] { 0, 1, 2, 4, 5, 7 }));
+            Console.WriteLine(Exercises.BestSum(100, new int[] { 10, 25 }));
+
+            //Console.WriteLine(LeetCode.Search(new int[] { -1, 0, 3, 5, 9, 12 }, 1));
 
             //Console.WriteLine(LeetCode.ReorderLogFiles(new string[] { "a1 9 2 3 1", "g1 act car", "zo4 4 7", "ab1 off key dog", "a8 act zoo", "a2 act car" }));
 

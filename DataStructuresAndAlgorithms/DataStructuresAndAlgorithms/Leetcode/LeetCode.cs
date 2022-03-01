@@ -840,7 +840,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Each range[a, b] in the list should be output as:
         //"a->b" if a != b
         //"a" if a == b
-
         public static IList<string> SummaryRanges(int[] nums)
         {
             //validation
@@ -890,5 +889,59 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             return ranges;
         }
+
+        //704. Binary Search
+        //Given an array of integers nums which is sorted in ascending order, and an integer target, write a function to search target in nums. If target exists, then return its index. Otherwise, return -1.
+        //You must write an algorithm with O(log n) runtime complexity.
+        public static int Search(int[] nums, int target)
+        {
+            if (nums == null || nums.Length == 0)
+                return -1;
+
+            if (nums.Length == 1)
+            {
+                if (nums[0] == target)
+                    return 0;
+                else
+                    return -1;
+            }
+
+            var mid = nums.Length / 2;
+            var midNum = nums[mid];
+            if (midNum == target)
+                return mid;
+
+            //search in right side.
+            if (target > midNum)
+            {
+                var rightLength = nums.Length - (mid + 1);
+                var rightArray = new int[rightLength];
+
+                Array.Copy(nums, mid + 1, rightArray, 0, rightLength);
+
+                var idx = Search(rightArray, target);
+                if (idx == -1)
+                    return idx;
+                else
+                    return mid + 1 + Search(rightArray, target);
+            }
+            //search in left side.
+            else
+            {
+                var leftLength = mid;
+                var leftArray = new int[leftLength];
+
+                Array.Copy(nums, 0, leftArray, 0, mid);
+                return Search(leftArray, target);
+            }
+        }
+
+        //198. House Robber
+        //You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+        //Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+        //public static int Rob(int[] nums)
+        //{
+
+        //}
     }
 }
