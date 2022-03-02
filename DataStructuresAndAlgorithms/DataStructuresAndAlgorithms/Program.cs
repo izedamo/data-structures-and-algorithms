@@ -11,7 +11,7 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Exercises.BestSum(100, new int[] { 10, 25 }));
+            Console.WriteLine(Exercises.CountConstruct("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new string[] { "e", "ee", "eee", "eeee", "eeeeef" }));
 
             //Console.WriteLine(LeetCode.Search(new int[] { -1, 0, 3, 5, 9, 12 }, 1));
 

@@ -602,5 +602,78 @@ namespace DataStructuresAndAlgorithms
 
             return bestSum(targetSum, null);
         }
+
+        //given a target word and a list of words. determine (true/false) whether or not it is possible to create the target using words from the list.
+        public static bool CanConstruct(string targetWord, string[] words)
+        {
+            //validations here.
+
+            var memo = new Dictionary<string, bool>();
+
+            bool canConstruct(string target)
+            {
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                //base case.
+                if (target.Equals(string.Empty))
+                    return true;
+
+                //recursive case.
+                foreach (var word in words)
+                {
+                    if (target.StartsWith(word))
+                    {
+                        var remainder = target[word.Length..];
+                        if (canConstruct(remainder))
+                        {
+                            memo.Add(target, true);
+                            return memo[target];
+                        }
+                    }
+                }
+
+                memo.Add(target, false);
+                return memo[target];
+            }
+
+            return canConstruct(targetWord);
+        }
+
+        //given a target word  and a list of words. determine the number of ways to form the target using the words from the list.
+        public static long CountConstruct(string targetWord, string[] words)
+        {
+            //validations here.
+
+            var memo = new Dictionary<string, long>();
+
+            long countConstruct(string target)
+            {
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                //base.
+                if (target.Equals(string.Empty))
+                    return 1;
+
+                long answer = 0;
+
+                //recursive.
+                foreach (var word in words)
+                {
+                    if (target.StartsWith(word))
+                    {
+                        var remainder = target.Substring(word.Length);
+
+                        answer += countConstruct(remainder);
+                    }
+                }
+
+                memo.Add(target, answer);
+                return answer;
+            }
+
+            return countConstruct(targetWord);
+        }
     }
 }
