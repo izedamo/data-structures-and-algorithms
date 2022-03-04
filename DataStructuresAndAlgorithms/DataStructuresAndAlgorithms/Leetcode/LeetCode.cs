@@ -943,5 +943,100 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //{
 
         //}
+
+        //799. Champagne Tower
+        //top-down DP
+        public static double ChampagneTower(int poured, int query_row, int query_glass)
+        {
+            //validations
+
+
+            var glasses = new Dictionary<string, double>();
+
+            void fillGlasses(double poured, int r, int g)
+            {
+                double current = 0;
+
+                if (glasses.ContainsKey($"{r}:{g}"))
+                    current = glasses[$"{r}:{g}"];
+
+                //base.
+                if (poured == 0)
+                    return;
+
+                if (current + poured > 1)
+                {
+                    //recursive
+                    double remainingChampagne = poured + current - 1;
+                    current = 1;
+                    glasses[$"{r}:{g}"] = current;
+
+                    if (r < query_row)
+                    {
+                        fillGlasses(remainingChampagne / 2, r + 1, g);
+                        fillGlasses(remainingChampagne / 2, r + 1, g + 1);
+                    }
+                }
+                else
+                {
+                    current += poured;
+                    glasses[$"{r}:{g}"] = current;
+                }
+            }
+
+            fillGlasses(poured, 0, 0);
+
+            return glasses.ContainsKey($"{query_row}:{query_glass}") ? glasses[$"{query_row}:{query_glass}"] : 0;
+        }
+
+        //799. Champagne Tower
+        //bottom-up DP
+        public static double ChampagneTowerDP(int poured, int query_row, int query_glass)
+        {
+            //validations
+
+            var memo = new Dictionary<string, double>();
+
+            double fillGlass(int r, int g)
+            {
+                var key = $"{r}:{g}";
+                if (memo.ContainsKey(key))
+                    return memo[key];
+
+                //base
+                if (r == 0)
+                {
+                    return poured;
+                }
+
+                //recursive
+                double left = 0;
+                if (r - 1 >= 0 && g - 1 >= 0)
+                {
+                    var leftParent = fillGlass(r - 1, g - 1);
+
+                    if (leftParent > 1) {
+                        left = (leftParent - 1) / 2;
+                    }
+                }
+
+                double right = 0;
+                if (r - 1 >= 0 && g <= r - 1)
+                {
+                    var rightParent = fillGlass(r - 1, g);
+
+                    if(rightParent > 1)
+                    {
+                        right = (rightParent - 1) / 2;
+                    }
+                }
+                memo.Add(key, left + right);
+                return memo[key];
+            }
+
+            var receivedChampagne = fillGlass(query_row, query_glass);
+
+            return receivedChampagne > 1 ? 1 : receivedChampagne;
+        }
     }
 }

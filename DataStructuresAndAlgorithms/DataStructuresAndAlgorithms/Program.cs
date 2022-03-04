@@ -11,7 +11,9 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Exercises.CountConstruct("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new string[] { "e", "ee", "eee", "eeee", "eeeeef" }));
+            Console.WriteLine(LeetCode.ChampagneTowerDP(100000009, 33, 17));
+
+            //Console.WriteLine(Exercises.AllConstruct("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new string[] { "a", "aa", "aaa", "aaaa", "aaaaa" }));
 
             //Console.WriteLine(LeetCode.Search(new int[] { -1, 0, 3, 5, 9, 12 }, 1));
 

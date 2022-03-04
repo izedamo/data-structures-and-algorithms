@@ -675,5 +675,46 @@ namespace DataStructuresAndAlgorithms
 
             return countConstruct(targetWord);
         }
+
+        //given a target word and a list of words. return all possible combinations of forming the target using the words from the list.
+        public static List<List<string>> AllConstruct(string targetWord, string[] words)
+        {
+            //validations here.
+
+            var memo = new Dictionary<string, List<List<string>>>();
+
+            List<List<string>> allConstruct(string target)
+            {
+                if (memo.ContainsKey(target))
+                    return memo[target];
+
+                //base.
+                if (target.Equals(string.Empty))
+                    return new List<List<string>> { new List<string>() };
+
+                var combinations = new List<List<string>>();
+                //recursive.
+                foreach (var word in words)
+                {
+                    if (target.StartsWith(word))
+                    {
+                        var remainder = target.Substring(word.Length);
+
+                        var remainderCombinations = allConstruct(remainder);
+
+                        foreach (var combo in remainderCombinations)
+                        {
+                            combo.Add(word);
+                        }
+
+                        combinations.AddRange(remainderCombinations);
+                    }
+                }
+                memo.Add(target, combinations);
+                return combinations;
+            }
+
+            return allConstruct(targetWord);
+        }
     }
 }
