@@ -3,12 +3,58 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
-    public class LeetCode
+    public static class LeetCode
     {
+        //724. Find Pivot Index
+        //Given an array of integers nums, calculate the pivot index of this array.
+        //The pivot index is the index where the sum of all the numbers strictly to the left of the index is equal to the sum of all the numbers strictly to the index's right. If the index is on the left edge of the array, then the left sum is 0 because there are no elements to the left.This also applies to the right edge of the array. Return the leftmost pivot index.If no such index exists, return -1.
+        public static int PivotIndex(int[] nums)
+        {
+            if (nums == null || nums.Length == 0 || nums.Length == 1) return 0;
+
+            var leftSum = 0;
+            var rightSum = nums.Sum();
+
+            for (var idx = 0; idx < nums.Length; idx++)
+            {
+                if (idx != 0)
+                {
+                    leftSum += nums[idx - 1];
+                }
+
+                rightSum -= nums[idx];
+
+                if (leftSum == rightSum) return idx;
+            }
+
+            return -1;
+        }
+
+        //1480. Running Sum of 1d Array
+        //Given an array nums. We define a running sum of an array as runningSum[i] = sum(nums[0]…nums[i]). Return the running sum of nums.
+        public static int[] RunningSum(int[] nums)
+        {
+            //validations.
+            if (nums == null || nums.Length == 0)
+                return Array.Empty<int>();
+
+            var runningSums = new int[nums.Length];
+
+            var prev = 0;
+
+            for (var idx = 0; idx < nums.Length; idx++)
+            {
+                var sum = prev + nums[idx];
+                runningSums[idx] = sum;
+                prev = sum;
+            }
+
+            return runningSums;
+        }
+
         //Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.
         public static int[] TwoSum(int[] nums, int target)
         {
@@ -495,25 +541,25 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             var charsInBoard = new HashSet<char>();
 
-            for(var i = 0; i <= lastRowIdx; i++)
+            for (var i = 0; i <= lastRowIdx; i++)
             {
-                for(var j = 0; j <= lastColIdx; j++)
+                for (var j = 0; j <= lastColIdx; j++)
                 {
                     charsInBoard.Add(board[i][j]);
                 }
             }
 
-            foreach(var chr in word)
+            foreach (var chr in word)
             {
                 if (!charsInBoard.Contains(chr))
                     return false;
             }
 
-            for(var i = 0; i <= lastRowIdx; i++)
+            for (var i = 0; i <= lastRowIdx; i++)
             {
-                for(var j = 0; j <= lastColIdx; j++)
+                for (var j = 0; j <= lastColIdx; j++)
                 {
-                    if(board[i][j] == word[0])
+                    if (board[i][j] == word[0])
                     {
                         var currentSubStr = new Stack<int[]>();
                         var visitedPositions = new Dictionary<int[], HashSet<string>>();
@@ -524,7 +570,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
                         var ptr = 1;
 
-                        while(currentSubStr.Count != 0 && ptr < word.Length)
+                        while (currentSubStr.Count != 0 && ptr < word.Length)
                         {
                             var nextChar = word[ptr];
                             var position = currentSubStr.Peek();
@@ -546,7 +592,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 ptr++;
                             }
 
-                            else if (aboveRow >= 0 && !usedCharPostions.Contains($"{aboveRow}:{col}") && !visitedPositions[position].Contains($"{aboveRow}:{col}") &&  board[aboveRow][col] == nextChar)
+                            else if (aboveRow >= 0 && !usedCharPostions.Contains($"{aboveRow}:{col}") && !visitedPositions[position].Contains($"{aboveRow}:{col}") && board[aboveRow][col] == nextChar)
                             {
                                 currentSubStr.Push(new int[] { aboveRow, col });
                                 usedCharPostions.Add($"{aboveRow}:{col}");
@@ -554,7 +600,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 ptr++;
                             }
 
-                            else if (previousCol >= 0 && !usedCharPostions.Contains($"{row}:{previousCol}") && !visitedPositions[position].Contains($"{row}:{previousCol}")  && board[row][previousCol] == nextChar)
+                            else if (previousCol >= 0 && !usedCharPostions.Contains($"{row}:{previousCol}") && !visitedPositions[position].Contains($"{row}:{previousCol}") && board[row][previousCol] == nextChar)
                             {
                                 currentSubStr.Push(new int[] { row, previousCol });
                                 usedCharPostions.Add($"{row}:{previousCol}");
@@ -621,7 +667,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             for (var row = 0; row <= lastRowIdx; row++)
             {
-                for(var col = 0; col <= lastColIdx; col++)
+                for (var col = 0; col <= lastColIdx; col++)
                 {
                     if (FindWord(row, col, 0))
                         return true;
@@ -663,18 +709,18 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     queue.Enqueue(new int[] { row, col });
             }
 
-            for(var row = 0; row <= lastRow; row++)
+            for (var row = 0; row <= lastRow; row++)
             {
-                for(var col = 0; col <= lastCol; col++)
+                for (var col = 0; col <= lastCol; col++)
                 {
-                    if(ShouldProcessNum(row, col))
+                    if (ShouldProcessNum(row, col))
                     {
                         var numsToProcess = new Queue<int[]>();
                         numsToProcess.Enqueue(new int[] { row, col });
 
                         numOfIslands++;
 
-                        while(numsToProcess.Count > 0)
+                        while (numsToProcess.Count > 0)
                         {
                             var position = numsToProcess.Dequeue();
 
@@ -1015,7 +1061,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 {
                     var leftParent = fillGlass(r - 1, g - 1);
 
-                    if (leftParent > 1) {
+                    if (leftParent > 1)
+                    {
                         left = (leftParent - 1) / 2;
                     }
                 }
@@ -1025,7 +1072,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 {
                     var rightParent = fillGlass(r - 1, g);
 
-                    if(rightParent > 1)
+                    if (rightParent > 1)
                     {
                         right = (rightParent - 1) / 2;
                     }
