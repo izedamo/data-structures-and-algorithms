@@ -8,6 +8,28 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //392. Is Subsequence
+        //Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+        //A subsequence of a string is a new string that is formed from the original string by deleting some(can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+        public static bool IsSubsequence(string s, string t)
+        {
+            if (s == null || t == null || s.Length > t.Length)
+                return false;
+            if (s.Equals(string.Empty)) return true;
+
+            var s_idx = 0;
+
+            foreach (var chr in t)
+            {
+                if (chr == s[s_idx])
+                    s_idx++;
+
+                if (s_idx == s.Length) return true;
+            }
+
+            return false;
+        }
+
         //205. Isomorphic Strings
         //Given two strings s and t, determine if they are isomorphic.
         //Two strings s and t are isomorphic if the characters in s can be replaced to get t. All occurrences of a character must be replaced with another character while preserving the order of characters.No two characters may map to the same character, but a character may map to itself.
@@ -22,7 +44,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
             {
                 var char_S = s[idx];
                 var char_T = t[idx];
-                
+
                 //check char_S has a map in S->T.
                 if (s2tMap.ContainsKey(char_S))
                 {
@@ -117,8 +139,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum. A subarray is a contiguous part of an array.
         public static int MaxSubArray(int[] nums)
         {
-
-
             return 0;
         }
 
@@ -442,7 +462,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             if (movesRemaining > 0)
                 return "Pending";
-
             else return "Draw";
         }
 
@@ -470,7 +489,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     truckSize -= boxesAvailable;
                     currentBoxType++;
                 }
-
                 else
                 {
                     maxUnits += truckSize * unitsPerBox;
@@ -629,7 +647,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 visitedPositions[position].Add($"{belowRow}:{col}");
                                 ptr++;
                             }
-
                             else if (aboveRow >= 0 && !usedCharPostions.Contains($"{aboveRow}:{col}") && !visitedPositions[position].Contains($"{aboveRow}:{col}") && board[aboveRow][col] == nextChar)
                             {
                                 currentSubStr.Push(new int[] { aboveRow, col });
@@ -637,7 +654,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 visitedPositions[position].Add($"{aboveRow}:{col}");
                                 ptr++;
                             }
-
                             else if (previousCol >= 0 && !usedCharPostions.Contains($"{row}:{previousCol}") && !visitedPositions[position].Contains($"{row}:{previousCol}") && board[row][previousCol] == nextChar)
                             {
                                 currentSubStr.Push(new int[] { row, previousCol });
@@ -645,7 +661,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 visitedPositions[position].Add($"{row}:{previousCol}");
                                 ptr++;
                             }
-
                             else if (nextCol <= lastColIdx && !usedCharPostions.Contains($"{row}:{nextCol}") && !visitedPositions[position].Contains($"{row}:{nextCol}") && board[row][nextCol] == nextChar)
                             {
                                 currentSubStr.Push(new int[] { row, nextCol });
@@ -804,7 +819,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
             {
                 for (var col = 0; col <= lastCol; col++)
                 {
-
                     //found an island.
                     if (grid[row][col] == '1' && !visited.Contains((row, col)))
                     {
@@ -838,7 +852,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
         public static string[] ReorderLogFiles(string[] logs)
         {
-
             //validations.
             if (logs == null || logs.Length == 0 || logs.Length == 1)
                 return logs;
@@ -896,7 +909,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 // check if it is a digit log.
                 for (var idx = 1; idx < words.Length; idx++)
                 {
-
                     //found it is a digit log.
                     if (digitSet.Contains(words[idx][0]))
                     {
@@ -1025,7 +1037,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
         //public static int Rob(int[] nums)
         //{
-
         //}
 
         //799. Champagne Tower
@@ -1033,7 +1044,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
         public static double ChampagneTower(int poured, int query_row, int query_glass)
         {
             //validations
-
 
             var glasses = new Dictionary<string, double>();
 
