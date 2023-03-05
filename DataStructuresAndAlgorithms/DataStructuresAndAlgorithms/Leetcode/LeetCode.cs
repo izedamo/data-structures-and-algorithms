@@ -8,6 +8,44 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //205. Isomorphic Strings
+        //Given two strings s and t, determine if they are isomorphic.
+        //Two strings s and t are isomorphic if the characters in s can be replaced to get t. All occurrences of a character must be replaced with another character while preserving the order of characters.No two characters may map to the same character, but a character may map to itself.
+        public static bool IsIsomorphic(string s, string t)
+        {
+            if (s.Length != t.Length) return false;
+
+            var s2tMap = new Dictionary<char, char>();
+            var t2sMap = new Dictionary<char, char>();
+
+            for (var idx = 0; idx < s.Length; idx++)
+            {
+                var char_S = s[idx];
+                var char_T = t[idx];
+                
+                //check char_S has a map in S->T.
+                if (s2tMap.ContainsKey(char_S))
+                {
+                    var char_Replaced = s2tMap[char_S];
+
+                    if (char_Replaced != char_T) return false;
+                }
+
+                //check char_T has previously been mapped to a char in S.
+                if (t2sMap.ContainsKey(char_T))
+                {
+                    var mapped_SChar = t2sMap[char_T];
+
+                    if (mapped_SChar != char_S) return false;
+                }
+
+                s2tMap[char_S] = char_T;
+                t2sMap[char_T] = char_S;
+            }
+
+            return true;
+        }
+
         //724. Find Pivot Index
         //Given an array of integers nums, calculate the pivot index of this array.
         //The pivot index is the index where the sum of all the numbers strictly to the left of the index is equal to the sum of all the numbers strictly to the index's right. If the index is on the left edge of the array, then the left sum is 0 because there are no elements to the left.This also applies to the right edge of the array. Return the leftmost pivot index.If no such index exists, return -1.

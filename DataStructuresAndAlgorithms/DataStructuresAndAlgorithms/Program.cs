@@ -11,7 +11,7 @@ namespace DataStructuresAndAlgorithms
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(LeetCode.ChampagneTowerDP(100000009, 33, 17));
+            Console.WriteLine(LeetCode.IsIsomorphic("foo", "bar"));
 
             //Console.WriteLine(Exercises.AllConstruct("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new string[] { "a", "aa", "aaa", "aaaa", "aaaaa" }));
 
