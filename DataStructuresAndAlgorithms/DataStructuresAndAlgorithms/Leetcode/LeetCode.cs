@@ -1,13 +1,64 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //21. Merge Two Sorted Lists
+        //You are given the heads of two sorted linked lists list1 and list2.
+        //Merge the two lists in a one sorted list.The list should be made by splicing together the nodes of the first two lists. Return the head of the merged linked list.
+        public static ListNode MergeTwoLists(ListNode list1, ListNode list2)
+        {
+            //Use more strict validations.
+            if (list1 == null)
+                return list2;
+            if (list2 == null)
+                return list1;
+
+            ListNode head = null;
+            ListNode prev = null;
+            ListNode smaller = null;
+
+            while (list1 != null && list2 != null)
+            {
+                if (list1.val > list2.val)
+                {
+                    smaller = list2;
+                    list2 = list2.next;
+                }
+                else
+                {
+                    smaller = list1;
+                    list1 = list1.next;
+                }
+
+                if (head == null)
+                {
+                    head = smaller;
+                }
+                else
+                {
+                    prev.next = smaller;
+                }
+                prev = smaller;
+            }
+
+            if (list1 == null)
+            {
+                prev.next = list2;
+            }
+            else
+                prev.next = list1;
+
+            return head;
+        }
+
         //392. Is Subsequence
         //Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
         //A subsequence of a string is a new string that is formed from the original string by deleting some(can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
