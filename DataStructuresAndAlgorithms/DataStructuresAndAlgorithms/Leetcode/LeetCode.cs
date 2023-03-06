@@ -10,6 +10,57 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //206. Reverse Linked List
+        //Given the head of a singly linked list, reverse the list, and return the reversed list.
+        // Time = O(n) | Space = O(1)
+        public static ListNode ReverseListIterative(ListNode head)
+        {
+            if (head == null) return null;
+
+            ListNode prev = null;
+            ListNode next = null;
+
+            while (head.next != null)
+            {
+                next = head.next;
+                head.next = prev;
+                prev = head;
+                head = next;
+            }
+
+            head.next = prev;
+
+            return head;
+        }
+
+        //206. Reverse Linked List
+        //Given the head of a singly linked list, reverse the list, and return the reversed list.
+        //This approach is using Stack. Time = O(2n) | Space = O(n)
+        //Out of Memory error.
+        public static ListNode ReverseList(ListNode head)
+        {
+            if (head == null) return null;
+
+            var nodes = new Stack<ListNode>();
+            while (head != null)
+            {
+                nodes.Push(head);
+                head = head.next;
+            }
+
+            var newHead = nodes.Pop();
+            var prev = newHead;
+
+            while (nodes.Count > 0)
+            {
+                var node = nodes.Pop();
+                prev.next = node;
+                prev = node;
+            }
+
+            return newHead;
+        }
+
         //21. Merge Two Sorted Lists
         //You are given the heads of two sorted linked lists list1 and list2.
         //Merge the two lists in a one sorted list.The list should be made by splicing together the nodes of the first two lists. Return the head of the merged linked list.
