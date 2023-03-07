@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 
@@ -10,6 +12,103 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //142. Linked List Cycle II
+        //Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return null.
+        //There is private a cycle in private a linked list if there is private some node in private the list private that can private be reached private again by private continuously following private the next pointer.Internally, pos is private used to private denote the private index of private the node private that tail's next pointer is connected to (0-indexed). It is -1 if there is no cycle. Note that pos is not passed as a parameter.
+        //Do not modify the linked list.
+        //Time = O(n) | Space = O(1)
+        //Distance from head of list to cycle start = distance from meeting point of slow and fast pointers to the cycle start.
+        public static ListNode DetectCycleConstantMemory(ListNode head)
+        {
+            if (head == null)
+                return null;
+
+            var slow = head;
+            var fast = head;
+            var cycleLength = 0;
+
+            //Step 1: Find the cycle exists in list.
+            while (fast != null && fast.next != null)
+            {
+                slow = slow.next;
+                fast = fast.next.next;
+
+                if (slow == fast)
+                {
+                    do
+                    {
+                        slow = slow.next;
+                        cycleLength++;
+                    }
+                    while (slow != fast);
+                    break;
+                }
+            }
+
+            //return if no cycle.
+            if (fast == null || fast.next == null)
+                return null;
+
+            //Step 2: find cycle start.
+            //Distance from head of list to cycle start = distance from meeting point of slow and fast pointers to the cycle start.
+            var cyclePtr = head;
+            while (cycleLength != 0)
+            {
+                cycleLength--;
+                cyclePtr = cyclePtr.next;
+            }
+
+            while (cyclePtr != head)
+            {
+                cyclePtr = cyclePtr.next;
+                head = head.next;
+            }
+
+            return head;
+        }
+
+        //142. Linked List Cycle II
+        //Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return null.
+        //There is private a cycle in private a linked list if there is private some node in private the list private that can private be reached private again by private continuously following private the next pointer.Internally, pos is private used to private denote the private index of private the node private that tail's next pointer is connected to (0-indexed). It is -1 if there is no cycle. Note that pos is not passed as a parameter.
+        //Do not modify the linked list.
+        //Time = O(n) | Space = O(n)
+        public static ListNode DetectCycle(ListNode head)
+        {
+            if (head == null)
+                return null;
+
+            var nodes = new HashSet<ListNode>();
+            while (head != null)
+            {
+                if (nodes.Contains(head))
+                    return head;
+                nodes.Add(head);
+                head = head.next;
+            }
+
+            return null;
+        }
+
+        //876. Middle of the Linked List
+        //Given the head of a singly linked list, return the middle node of the linked list.
+        //If there are two middle nodes, return the second middle node.
+        public static ListNode MiddleNode(ListNode head)
+        {
+            if (head == null)
+                return null;
+
+            var mid = head;
+            for (var length = 1; head != null; length++)
+            {
+                if (length % 2 == 0)
+                    mid = mid.next;
+
+                head = head.next;
+            }
+
+            return mid;
+        }
+
         //206. Reverse Linked List
         //Given the head of a singly linked list, reverse the list, and return the reversed list.
         // Time = O(n) | Space = O(1)
