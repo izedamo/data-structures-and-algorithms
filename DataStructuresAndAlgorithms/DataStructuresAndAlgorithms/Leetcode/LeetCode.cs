@@ -14,6 +14,49 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //409. Longest Palindrome
+        //Given a string s which consists of lowercase or uppercase letters, return the length of the longest palindrome that can be built with those letters.
+        //Letters are case sensitive, for example, "Aa" is not considered a palindrome here.
+        public static int LongestPalindrome(string s)
+        {
+            if (s == null || s.Length == 0)
+                return 0;
+            if (s.Length == 1)
+                return 1;
+
+            var charCounts = new Dictionary<char, int>();
+
+            foreach (var chr in s)
+            {
+                if (charCounts.ContainsKey(chr))
+                    charCounts[chr]++;
+                else
+                    charCounts[chr] = 1;
+            }
+
+            var oddUsed = false;
+            var palindromeLength = 0;
+            foreach (var kv in charCounts)
+            {
+                if (kv.Value % 2 == 0)
+                    palindromeLength += kv.Value;
+                else
+                {
+                    if (oddUsed)
+                    {
+                        palindromeLength += kv.Value - 1;
+                    }
+                    else
+                    {
+                        oddUsed = true;
+                        palindromeLength += kv.Value;
+                    }
+                }
+            }
+
+            return palindromeLength;
+        }
+
         //121. Best Time to Buy and Sell Stock
         //You are given an array prices where prices[i] is the price of a given stock on the ith day.
         //You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction.If you cannot achieve any profit, return 0.
