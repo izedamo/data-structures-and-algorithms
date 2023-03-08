@@ -1,17 +1,39 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Transactions;
 using System.Xml.Linq;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //121. Best Time to Buy and Sell Stock
+        //You are given an array prices where prices[i] is the price of a given stock on the ith day.
+        //You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction.If you cannot achieve any profit, return 0.
+        public static int MaxProfit(int[] prices)
+        {
+            if (prices == null || prices.Length < 2)
+                return 0;
+
+            var maxProfit = 0;
+            var minPrice = prices[0];
+
+            foreach (var price in prices)
+            {
+                minPrice = Math.Min(minPrice, price);
+                maxProfit = Math.Max(maxProfit, price - minPrice);
+            }
+
+            return maxProfit;
+        }
+
         //142. Linked List Cycle II
         //Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return null.
         //There is private a cycle in private a linked list if there is private some node in private the list private that can private be reached private again by private continuously following private the next pointer.Internally, pos is private used to private denote the private index of private the node private that tail's next pointer is connected to (0-indexed). It is -1 if there is no cycle. Note that pos is not passed as a parameter.
