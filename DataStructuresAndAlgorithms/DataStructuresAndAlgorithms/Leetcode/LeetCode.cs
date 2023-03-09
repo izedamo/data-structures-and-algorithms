@@ -14,6 +14,49 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //102. Binary Tree Level Order Traversal
+        //Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+        public static IList<IList<int>> LevelOrder(TreeNode root)
+        {
+            var levelOrder = new List<IList<int>>();
+
+            if (root == null)
+                return levelOrder;
+
+            var levels = new Queue<IList<TreeNode>>();
+            levels.Enqueue(new List<TreeNode>
+            {
+                root
+            });
+
+            while (levels.Count > 0)
+            {
+                var level = levels.Dequeue();
+                var levelList = new List<int>();
+
+                var newLevel = new List<TreeNode>();
+
+                foreach (var node in level)
+                {
+                    if (node == null)
+                        continue;
+
+                    levelList.Add(node.val);
+
+                    newLevel.Add(node.left);
+                    newLevel.Add(node.right);
+                }
+
+                if (newLevel.Count > 0)
+                    levels.Enqueue(newLevel);
+
+                if (levelList.Count > 0)
+                    levelOrder.Add(levelList);
+            }
+
+            return levelOrder;
+        }
+
         //589. N-ary Tree Preorder Traversal
         //Given the root of an n-ary tree, return the preorder traversal of its nodes' values.
         //Nary-Tree input serialization is represented in their level order traversal.Each group of children is separated by the null value. See example:
