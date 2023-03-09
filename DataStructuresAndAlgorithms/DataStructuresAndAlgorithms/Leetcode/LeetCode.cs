@@ -14,6 +14,66 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static class LeetCode
     {
+        //589. N-ary Tree Preorder Traversal
+        //Given the root of an n-ary tree, return the preorder traversal of its nodes' values.
+        //Nary-Tree input serialization is represented in their level order traversal.Each group of children is separated by the null value. See example:
+        //Input: root = [1,null,3,2,4,null,5,6]
+        //Output: [1,3,5,6,2,4]
+        public static IList<int> PreorderIterative(Node root)
+        {
+            var preOrderList = new List<int>();
+
+            if (root == null)
+                return preOrderList;
+
+            var nodes = new Stack<Node>();
+            nodes.Push(root);
+
+            while (nodes.Count > 0)
+            {
+                var currentNode = nodes.Pop();
+                preOrderList.Add(currentNode.val);
+
+                for (var idx = currentNode.children.Count - 1; idx >= 0; idx--)
+                {
+                    var child = currentNode.children[idx];
+                    nodes.Push(child);
+                }
+            }
+
+            return preOrderList;
+        }
+
+        //589. N-ary Tree Preorder Traversal
+        //Given the root of an n-ary tree, return the preorder traversal of its nodes' values.
+        //Nary-Tree input serialization is represented in their level order traversal.Each group of children is separated by the null value. See example:
+        //Input: root = [1,null,3,2,4,null,5,6]
+        //Output: [1,3,5,6,2,4]
+        public static IList<int> PreorderRecursive(Node root)
+        {
+            var preOrderList = new List<int>();
+
+            if (root == null)
+                return preOrderList;
+
+            void recursivePreOrder(Node node, IList<int> nodes)
+            {
+                if (node == null)
+                    return;
+
+                nodes.Add(node.val);
+
+                foreach (var child in node.children)
+                {
+                    recursivePreOrder(child, nodes);
+                }
+            }
+
+            recursivePreOrder(root, preOrderList);
+
+            return preOrderList;
+        }
+
         //409. Longest Palindrome
         //Given a string s which consists of lowercase or uppercase letters, return the length of the longest palindrome that can be built with those letters.
         //Letters are case sensitive, for example, "Aa" is not considered a palindrome here.
