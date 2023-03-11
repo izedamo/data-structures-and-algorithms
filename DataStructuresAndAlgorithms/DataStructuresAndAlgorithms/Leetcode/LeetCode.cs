@@ -1388,7 +1388,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 if (idx == -1)
                     return idx;
                 else
-                    return mid + 1 + Search(rightArray, target);
+                    return mid + 1 + idx;
             }
             //search in left side.
             else
