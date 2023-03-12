@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
@@ -14,6 +15,53 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //98. Validate Binary Search Tree
+        //Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+        //A valid BST is defined as follows:
+        //The left subtree of a node contains only nodes with keys less than the node's key.
+        //The right subtree of a node contains only nodes with keys greater than the node's key.
+        //Both the left and right subtrees must also be binary search trees.
+        public static bool IsValidBST(TreeNode root)
+        {
+            //tuple format -> (tells whether tree is valid, min value in tree, max value in tree)
+            static (bool, int, int) minMaxAndValidation(TreeNode node)
+            {
+                //base case.
+                if (node.right == null && node.left == null)
+                    return (true, node.val, node.val);
+
+                //recursive case.
+                //find the max and min for left and right subtree
+                //the current node must be between max of left and min of right.
+                (bool, int, int)? left;
+                (bool, int, int)? right;
+
+                left = node.left == null ? null : minMaxAndValidation(node.left);
+                right = node.right == null ? null : minMaxAndValidation(node.right);
+
+                var isValidSubtree = (left.HasValue ? left.Value.Item1 && left.Value.Item3 < node.val : true) && (right.HasValue ? node.val < right.Value.Item2 && right.Value.Item1 : true);
+
+                var minMax = new List<int>
+                {
+                    node.val
+                };
+                if (left.HasValue)
+                {
+                    minMax.Add(left.Value.Item2);
+                    minMax.Add(left.Value.Item3);
+                }
+
+                if (right.HasValue)
+                {
+                    minMax.Add(right.Value.Item2);
+                    minMax.Add(right.Value.Item3);
+                }
+
+                return (isValidSubtree, minMax.Min(), minMax.Max());
+            }
+            return minMaxAndValidation(root).Item1;
+        }
+
         //102. Binary Tree Level Order Traversal
         //Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
         public static IList<IList<int>> LevelOrder(TreeNode root)
