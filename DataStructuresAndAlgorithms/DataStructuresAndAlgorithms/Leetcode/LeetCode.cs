@@ -15,6 +15,34 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //235. Lowest Common Ancestor of a Binary Search Tree
+        //Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.
+        //According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants(where we allow a node to be a descendant of itself).”
+        public static TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q)
+        {
+            TreeNode lca(TreeNode node)
+            {
+                if (node == null || p == null || q == null)
+                    return null;
+
+                // p will always be less than q.
+                if (p.val > q.val)
+                {
+                    (q, p) = (p, q);
+                }
+
+                if (p.val <= node.val && node.val <= q.val)
+                    return node;
+
+                if (p.val > node.val)
+                    return lca(node.right);
+
+                return lca(node.left);
+            }
+
+            return lca(root);
+        }
+
         //98. Validate Binary Search Tree
         //Given the root of a binary tree, determine if it is a valid binary search tree (BST).
         //A valid BST is defined as follows:
