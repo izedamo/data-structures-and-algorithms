@@ -1336,6 +1336,61 @@ namespace DataStructuresAndAlgorithms.Leetcode
             return numOfIslands;
         }
 
+        public static int NumIslands3(char[][] grid)
+        {
+            //validations
+            if (grid == null || grid.Length == 0 || grid[0].Length == 0)
+                return 0;
+
+            var numOfIslands = 0;
+
+            var rowLength = grid.Length;
+            var columnLength = grid[0].Length;
+
+            var visitedLandAreas = new HashSet<(int, int)>();
+
+            void VisitAdjacentLand(int row, int col, Queue<(int, int)> queue)
+            {
+                if (row < 0 || row >= rowLength || col < 0 || col >= columnLength || visitedLandAreas.Contains((row, col)) || grid[row][col] != '1')
+                    return;
+
+                visitedLandAreas.Add((row, col));
+                queue.Enqueue((row, col));
+            }
+
+            for (var row = 0; row < rowLength; row++)
+            {
+                for (var col = 0; col < columnLength; col++)
+                {
+                    var area = grid[row][col];
+
+                    //found land. span all the connected land.
+                    if (area == '1' && !visitedLandAreas.Contains((row, col)))
+                    {
+                        numOfIslands++;
+
+                        var landAreas = new Queue<(int, int)>();
+                        landAreas.Enqueue((row, col));
+
+                        while (landAreas.Count > 0)
+                        {
+                            var (r, c) = landAreas.Dequeue();
+
+                            //grid[r][c] = 'X';
+
+                            VisitAdjacentLand(r + 1, c, landAreas);
+                            VisitAdjacentLand(r - 1, c, landAreas);
+                            VisitAdjacentLand(r, c + 1, landAreas);
+                            VisitAdjacentLand(r, c - 1, landAreas);
+                        }
+                    }
+                    else continue;
+                }
+            }
+
+            return numOfIslands;
+        }
+
         public static string[] ReorderLogFiles(string[] logs)
         {
             //validations.
