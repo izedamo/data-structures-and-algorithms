@@ -7,11 +7,12 @@ using System.Collections.Generic;
 
 namespace DataStructuresAndAlgorithms
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.WriteLine(LeetCode.IsIsomorphic("foo", "bar"));
+            //Console.WriteLine(LeetCode.FloodFill(new int[][] { new int[] { 1, 1, 1 }, new int[] { 1, 1, 0 }, new int[] { 1, 0, 1 } }, 1, 1, 2));
+            Console.WriteLine(LeetCode.FloodFill(new int[][] { new int[] { 0, 0, 0 }, new int[] { 0, 0, 0 } }, 0, 0, 0));
 
             //Console.WriteLine(Exercises.AllConstruct("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new string[] { "a", "aa", "aaa", "aaaa", "aaaaa" }));
 

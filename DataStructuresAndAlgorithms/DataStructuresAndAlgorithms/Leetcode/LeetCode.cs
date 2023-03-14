@@ -3,18 +3,59 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Transactions;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //733. Flood Fill
+        //An image is represented by an m x n integer grid image where image[i][j] represents the pixel value of the image.
+        //You are also given three integers sr, sc, and color.You should perform a flood fill on the image starting from the pixel image[sr][sc].
+        //To perform a flood fill, consider the starting pixel, plus any pixels connected 4-directionally to the starting pixel of the same color as the starting pixel, plus any pixels connected 4-directionally to those pixels (also with the same color), and so on.Replace the color of all of the aforementioned pixels with color. Return the modified image after performing the flood fill.
+        public static int[][] FloodFill(int[][] image, int sr, int sc, int color)
+        {
+            var columnLength = image[0].Length;
+            var rowLength = image.Length;
+            var originalColor = image[sr][sc];
+
+            var pixels = new Queue<(int, int)>();
+            pixels.Enqueue((sr, sc));
+
+            while (pixels.Count > 0)
+            {
+                var (r, c) = pixels.Dequeue();
+
+                if (image[r][c] == originalColor && image[r][c] != color)
+                    image[r][c] = color;
+                else
+                    continue;
+                if (r + 1 < rowLength)
+                    pixels.Enqueue((r + 1, c));
+
+                if (r - 1 >= 0)
+                    pixels.Enqueue((r - 1, c));
+
+                if (c + 1 < columnLength)
+                    pixels.Enqueue((r, c + 1));
+
+                if (c - 1 >= 0)
+                    pixels.Enqueue((r, c - 1));
+            }
+
+            return image;
+        }
+
         //235. Lowest Common Ancestor of a Binary Search Tree
         //Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.
         //According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants(where we allow a node to be a descendant of itself).”
