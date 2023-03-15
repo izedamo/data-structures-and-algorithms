@@ -19,6 +19,37 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //509. Fibonacci Number
+        //The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1.
+        //That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1.
+        //Given n, calculate F(n).
+        public static int Fib(int n)
+        {
+            // uses DP.
+
+            if (n < 0)
+                return -1;
+
+            var fibs = new Dictionary<int, int>
+            {
+                { 0, 0 },
+                { 1, 1 }
+            };
+
+            int fib(int num)
+            {
+                if (fibs.TryGetValue(num, out int result))
+                    return result;
+                else
+                {
+                    fibs[num] = fib(num - 1) + fib(num - 2);
+                    return fibs[num];
+                }
+            }
+
+            return fib(n);
+        }
+
         //733. Flood Fill
         //An image is represented by an m x n integer grid image where image[i][j] represents the pixel value of the image.
         //You are also given three integers sr, sc, and color.You should perform a flood fill on the image starting from the pixel image[sr][sc].
