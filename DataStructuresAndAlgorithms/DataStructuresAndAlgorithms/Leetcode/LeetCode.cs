@@ -19,6 +19,34 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //70. Climbing Stairs
+        //You are climbing a staircase. It takes n steps to reach the top.
+        //Each time you can either climb 1 or 2 steps.In how many distinct ways can you climb to the top?
+        public static int ClimbStairs(int n)
+        {
+            if (n <= 0)
+                return 0;
+
+            var memo = new Dictionary<int, int>
+            {
+                { 1, 1 },
+                { 2, 2 }
+            };
+
+            int WaysToClimb(int steps)
+            {
+                if (memo.TryGetValue(steps, out int ways))
+                    return ways;
+                else
+                {
+                    memo[steps] = WaysToClimb(steps - 1) + WaysToClimb(steps - 2);
+                    return memo[steps];
+                }
+            }
+
+            return WaysToClimb(n);
+        }
+
         //509. Fibonacci Number
         //The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1.
         //That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1.
