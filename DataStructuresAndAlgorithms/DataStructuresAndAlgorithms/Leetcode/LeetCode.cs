@@ -19,6 +19,63 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //438. Find All Anagrams in a String
+        //Given two strings s and p, return an array of all the start indices of p's anagrams in s. You may return the answer in any order.
+        //An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+        public static IList<int> FindAnagrams(string s, string p)
+        {
+            var indices = new List<int>();
+            if (s == null || s.Length == 0 || p.Length > s.Length)
+                return indices;
+
+            var chars = new Dictionary<char, int>();
+            foreach (var chr in p)
+            {
+                if (chars.ContainsKey(chr))
+                    chars[chr]++;
+                else
+                    chars[chr] = 1;
+            }
+
+            var visited = new Dictionary<char, int>();
+            //calculate hashmap of first substring.
+            for (var idx = 0; idx < p.Length; idx++)
+            {
+                var chr = s[idx];
+
+                if (visited.ContainsKey(chr))
+                    visited[chr]++;
+                else
+                    visited[chr] = 1;
+            }
+
+            for (var idx = 0; idx < s.Length && (s.Length - (idx + 1) >= p.Length); idx++)
+            {
+                var track = p.Length + idx - 1;
+                var found = true;
+                foreach (var (key, value) in chars)
+                {
+                    if (!visited.ContainsKey(key) || visited[key] != value)
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    indices.Add(idx);
+                }
+                visited[s[idx]]--;
+
+                if (visited.ContainsKey(s[track]))
+                    visited[s[track]]++;
+                else
+                    visited[s[track]] = 1;
+            }
+
+            return indices;
+        }
+
         //746. Min Cost Climbing Stairs
         //You are given an integer array cost where cost[i] is the cost of ith step on a staircase. Once you pay the cost, you can either climb one or two steps.
         //You can either start from the step with index 0, or the step with index 1.
