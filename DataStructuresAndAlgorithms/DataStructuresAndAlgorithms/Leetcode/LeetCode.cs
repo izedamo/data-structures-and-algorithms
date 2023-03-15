@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data.SqlTypes;
 using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Globalization;
@@ -19,6 +20,34 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //1876. Substrings of Size Three with Distinct Characters
+        //A string is good if there are no repeated characters.
+        //Given a string s​​​​​, return the number of good substrings of length three in s​​​​​​. Note that if there are multiple occurrences of the same substring, every occurrence should be counted.
+        //A substring is a contiguous sequence of characters in a string.
+        public static int CountGoodSubstrings(string s)
+        {
+            var result = 0;
+
+            if (string.IsNullOrEmpty(s) || s.Length <= 2)
+                return result;
+
+            for (var start = 0; start < s.Length - 2; start++)
+            {
+                var seen = new HashSet<char>();
+
+                for (var idx = start; idx < start + 3; idx++)
+                {
+                    seen.Add(s[idx]);
+                }
+
+                if (seen.Count == 3)
+                    result++;
+                seen.Remove(s[start]);
+            }
+
+            return result;
+        }
+
         //438. Find All Anagrams in a String
         //Given two strings s and p, return an array of all the start indices of p's anagrams in s. You may return the answer in any order.
         //An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
