@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Transactions;
@@ -20,6 +21,91 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //2269. Find the K-Beauty of a Number
+        //The k-beauty of an integer num is defined as the number of substrings of num when it is read as a string that meet the following conditions:
+        //  It has a length of k.
+        //  It is a divisor of num.
+        //Given integers num and k, return the k-beauty of num. Note:
+        //  Leading zeros are allowed.
+        //  0 is not a divisor of any value.
+        //A substring is a contiguous sequence of characters in a string.
+        public static int DivisorSubstrings(int num, int k)
+        {
+            var stringNum = num.ToString();
+
+            var kBeauty = 0;
+            var subStrNum = new StringBuilder();
+            for (var windowEnd = 0; windowEnd < stringNum.Length; windowEnd++)
+            {
+                subStrNum.Append(stringNum[windowEnd]);
+
+                if (windowEnd >= k - 1)
+                {
+                    var subNum = Convert.ToInt32(subStrNum.ToString());
+                    if (subNum != 0 && num % subNum == 0)
+                        kBeauty++;
+                    subStrNum.Remove(0, 1);
+                }
+            }
+
+            return kBeauty;
+        }
+
+        //1763. Longest Nice Substring
+        //A string s is nice if, for every letter of the alphabet that s contains, it appears both in uppercase and lowercase. For example, "abABB" is nice because 'A' and 'a' appear, and 'B' and 'b' appear. However, "abA" is not because 'b' appears, but 'B' does not.
+        //Given a string s, return the longest substring of s that is nice.If there are multiple, return the substring of the earliest occurrence.If there are none, return an empty string.
+        //Haven't done with sliding window yet :|
+        public static string LongestNiceSubstring(string s)
+        {
+            if (string.IsNullOrEmpty(s) || s.Length < 2)
+                return string.Empty;
+
+            var longestNiceString = string.Empty;
+
+            return longestNiceString;
+        }
+
+        //Longest substring with at most 2 distinct characters.
+        //Given a string S, find the length of the longest substring T that contains at most 2 distinct characters
+        //For example, Given S = "eceba", T is "ece" which it's length is 3.
+        public static int LongestSubstring(string s)
+        {
+            var longestLength = int.MinValue;
+            var currentChars = new Dictionary<char, int>();
+            var currentLength = 0;
+
+            var windowStart = 0;
+            for (var windowEnd = 0; windowEnd < s.Length; windowEnd++)
+            {
+                var chr = s[windowEnd];
+                if (currentChars.ContainsKey(chr))
+                {
+                    currentChars[chr]++;
+                }
+                else
+                    currentChars[chr] = 1;
+
+                currentLength++;
+
+                while (currentChars.Count > 2)
+                {
+                    var startChr = s[windowStart];
+
+                    currentChars[startChr]--;
+
+                    if (currentChars[startChr] < 1)
+                        currentChars.Remove(startChr);
+
+                    windowStart++;
+                    currentLength--;
+                }
+
+                longestLength = Math.Max(longestLength, currentLength);
+            }
+
+            return longestLength;
+        }
+
         //1876. Substrings of Size Three with Distinct Characters
         //A string is good if there are no repeated characters.
         //Given a string s​​​​​, return the number of good substrings of length three in s​​​​​​. Note that if there are multiple occurrences of the same substring, every occurrence should be counted.
