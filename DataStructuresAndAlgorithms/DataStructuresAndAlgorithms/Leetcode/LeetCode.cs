@@ -19,6 +19,29 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //746. Min Cost Climbing Stairs
+        //You are given an integer array cost where cost[i] is the cost of ith step on a staircase. Once you pay the cost, you can either climb one or two steps.
+        //You can either start from the step with index 0, or the step with index 1.
+        //Return the minimum cost to reach the top of the floor.
+        public static int MinCostClimbingStairs(int[] cost)
+        {
+            if (cost == null || cost.Length == 0)
+                return 0;
+
+            var memo = new Dictionary<int, int>();
+            int minCost(int step)
+            {
+                if (memo.TryGetValue(step, out var result))
+                    return result;
+
+                memo[step] = cost[step] + Math.Min(step + 1 < cost.Length ? minCost(step + 1) : 0, step + 2 < cost.Length ? minCost(step + 2) : 0);
+
+                return memo[step];
+            }
+
+            return Math.Min(minCost(0), minCost(1));
+        }
+
         //70. Climbing Stairs
         //You are climbing a staircase. It takes n steps to reach the top.
         //Each time you can either climb 1 or 2 steps.In how many distinct ways can you climb to the top?
@@ -39,6 +62,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     return ways;
                 else
                 {
+                    //if i take 1 step then ways to climb
                     memo[steps] = WaysToClimb(steps - 1) + WaysToClimb(steps - 2);
                     return memo[steps];
                 }
