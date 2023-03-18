@@ -3,12 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Data.SqlTypes;
 using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Security;
 using System.Text;
@@ -16,11 +19,301 @@ using System.Threading;
 using System.Transactions;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //299. Bulls and Cows
+        //You are playing the Bulls and Cows game with your friend.
+        //You write down a secret number and ask your friend to guess what the number is. When your friend makes a guess, you provide a hint with the following info:
+        //  The number of "bulls", which are digits in the guess that are in the correct position.
+        //  The number of "cows", which are digits in the guess that are in your secret number but are located in the wrong position.Specifically, the non-bull digits in the guess that could be rearranged such that they become bulls.
+        //Given the secret number secret and your friend's guess guess, return the hint for your friend's guess.
+        //The hint should be formatted as "xAyB", where x is the number of bulls and y is the number of cows. Note that both secret and guess may contain duplicate digits.
+        public static string GetHint(string secret, string guess)
+        {
+            if (secret == null || guess == null || secret.Length != guess.Length)
+                return string.Empty;
+
+            var nonBullChars = new Dictionary<char, int>();
+            var bulls = 0;
+            var cows = 0;
+            var potentialCowChars = new List<char>();
+
+            for (var idx = 0; idx < secret.Length; idx++)
+            {
+                var sChar = secret[idx];
+                var gChar = guess[idx];
+
+                if (gChar == sChar)
+                    bulls++;
+                else
+                {
+                    potentialCowChars.Add(gChar);
+
+                    if (nonBullChars.ContainsKey(sChar))
+                        nonBullChars[sChar]++;
+                    else
+                        nonBullChars[sChar] = 1;
+                }
+            }
+
+            foreach (var chr in potentialCowChars)
+            {
+                if (nonBullChars.ContainsKey(chr))
+                {
+                    cows++;
+                    nonBullChars[chr]--;
+                    if (nonBullChars[chr] == 0)
+                        nonBullChars.Remove(chr);
+                }
+            }
+
+            return bulls.ToString() + "A" + cows.ToString() + "B";
+        }
+
+        //play songs randomly w/o repeating already played songs. once all songs played, start playing songs from beginning with a new random order.
+        public static void PlaySongs(int[] songs)
+        {
+            if (songs == null)
+                return;
+
+            var repeatSongPtr = songs.Length - 1;
+
+            var randomIdx = 5;
+            Console.WriteLine($"Playing song: {randomIdx}");
+
+            //(songs[])
+        }
+
+        //[1,2,5,6,7,3,8,0,9]
+        public static int MaxSum(int[] input)
+        {
+            if (input == null)
+                return int.MinValue;
+
+            var maxSum = int.MinValue;
+
+            var start = 0;
+            var currentSum = 0;
+            for (var end = 0; end < input.Length; end++)
+            {
+                currentSum += input[end];
+
+                if (end >= 3)
+                {
+                    currentSum -= input[start];
+                    start++;
+                }
+
+                maxSum = Math.Max(maxSum, currentSum);
+            }
+
+            return maxSum;
+        }
+
+        //678. Valid Parenthesis String
+        //Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid. The following rules define a valid string:
+        //  Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+        //  Any right parenthesis ')' must have a corresponding left parenthesis '('.
+        //  Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+        //  '*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+        public static bool CheckValidString(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return false;
+            if (s.Length == 1 && s == "*")
+                return true;
+
+            var chars = new Stack<char>();
+            var starReplacements = 0;
+            foreach (var chr in s)
+            {
+                if (chr != ')')
+                    chars.Push(chr);
+                else
+                {
+                    if (chars.Count == 0)
+                        return false;
+
+                    var matchingChr = chars.Pop();
+                    if (matchingChr == '*')
+                        starReplacements++;
+                }
+            }
+
+            return chars.Count == 0 || starReplacements == chars.Count;
+        }
+
+        //71. Simplify Path
+        //Given a string path, which is an absolute path (starting with a slash '/') to a file or directory in a Unix-style file system, convert it to the simplified canonical path.
+        //In a Unix-style file system, a period '.' refers to the current directory, a double period '..' refers to the directory up a level, and any multiple consecutive slashes(i.e. '//') are treated as a single slash '/'. For this problem, any other format of periods such as '...' are treated as file/directory names.
+        //The canonical path should have the following format:
+        //  The path starts with a single slash '/'.
+        //  Any two directories are separated by a single slash '/'.
+        //  The path does not end with a trailing '/'.
+        //  The path only contains the directories on the path from the root directory to the target file or directory (i.e., no period '.' or double period '..')
+        //Return the simplified canonical path.
+        public static string SimplifyPath(string path)
+        {
+            var directories = path.Split('/');
+
+            var items = new Stack<string>();
+
+            foreach (var dir in directories)
+            {
+                if (dir == ".")
+                    continue;
+
+                if (dir == "..")
+                {
+                    if (items.Count > 0)
+                        items.Pop();
+                }
+                else if (dir != string.Empty)
+                    items.Push(dir);
+            }
+
+            if (items.Count > 0)
+            {
+                var canonicalPath = new StringBuilder();
+                while (items.Count > 0)
+                {
+                    var itemPath = items.Pop();
+                    canonicalPath.Insert(0, "/" + itemPath);
+                }
+
+                return canonicalPath.ToString();
+            }
+
+            return "/";
+        }
+
+        //844. Backspace String Compare
+        //Given two strings s and t, return true if they are equal when both are typed into empty text editors. '#' means a backspace character.
+        //Note that after backspacing an empty text, the text will continue empty.
+        public static bool BackspaceCompare(string s, string t)
+        {
+            //validations here.
+
+            var actualSString = ActualStringOf(s);
+            var actualTString = ActualStringOf(t);
+
+            return actualSString == actualTString;
+
+            static string ActualStringOf(string s)
+            {
+                var builder = new StringBuilder();
+                foreach (var chr in s)
+                {
+                    if (chr != '#')
+                        builder.Append(chr);
+                    else if (builder.Length > 0)
+                        builder.Remove(builder.Length - 1, 1);
+                }
+
+                return builder.ToString();
+            }
+        }
+
+        //424. Longest Repeating Character Replacement
+        //You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
+        //Return the length of the longest substring containing the same letter you can get after performing the above operations.
+        public static int CharacterReplacement(string s, int k)
+        {
+            var maxLength = int.MinValue;
+
+            var chars = s.ToHashSet();
+
+            foreach (var chr in chars)
+            {
+                //windowSize = end - start + 1. we can make replacement for windowSize <= k.
+                var start = 0;
+                var currentLength = 0;
+                var charCount = 0;
+                for (var end = 0; end < s.Length; end++)
+                {
+                    var currentChar = s[end];
+
+                    if (currentChar == chr)
+                        charCount++;
+                    var windowSize = end - start + 1;
+                    while (windowSize - charCount > k)
+                    {
+                        var outChar = s[start];
+
+                        if (outChar == chr)
+                            charCount--;
+                        start++;
+                        windowSize = end - start + 1;
+                    }
+
+                    maxLength = Math.Max(maxLength, windowSize);
+                }
+            }
+
+            return maxLength;
+        }
+
+        //643. Maximum Average Subarray I
+        //You are given an integer array nums consisting of n elements, and an integer k.
+        //Find a contiguous subarray whose length is equal to k that has the maximum average value and return this value.Any answer with a calculation error less than 10-5 will be accepted.
+        public static double FindMaxAverage(int[] nums, int k)
+        {
+            var maxAverage = double.MinValue;
+
+            var currentSum = 0;
+
+            var start = 0;
+            for (var end = 0; end < nums.Length; end++)
+            {
+                currentSum += nums[end];
+
+                if (end >= k - 1)
+                {
+                    var avg = (double)currentSum / k;
+                    maxAverage = Math.Max(maxAverage, avg);
+
+                    currentSum -= nums[start];
+                    start++;
+                }
+            }
+
+            return maxAverage;
+        }
+
+        //2379. Minimum Recolors to Get K Consecutive Black Blocks
+        //You are given a 0-indexed string blocks of length n, where blocks[i] is either 'W' or 'B', representing the color of the ith block. The characters 'W' and 'B' denote the colors white and black, respectively.
+        //You are also given an integer k, which is the desired number of consecutive black blocks. In one operation, you can recolor a white block such that it becomes a black block.
+        //Return the minimum number of operations needed such that there is at least one occurrence of k consecutive black blocks.
+        public static int MinimumRecolors(string blocks, int k)
+        {
+            var minOperations = int.MaxValue;
+
+            var currentOperations = 0;
+            var start = 0;
+            for (var end = 0; end < blocks.Length; end++)
+            {
+                var block = blocks[end];
+
+                if (block == 'W')
+                    currentOperations++;
+
+                if (end >= k - 1)
+                {
+                    minOperations = Math.Min(minOperations, currentOperations);
+
+                    if (blocks[start] == 'W')
+                        currentOperations--;
+                    start++;
+                }
+            }
+
+            return minOperations;
+        }
+
         //2269. Find the K-Beauty of a Number
         //The k-beauty of an integer num is defined as the number of substrings of num when it is read as a string that meet the following conditions:
         //  It has a length of k.
