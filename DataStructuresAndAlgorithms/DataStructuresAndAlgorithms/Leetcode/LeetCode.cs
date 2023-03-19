@@ -11,11 +11,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Threading;
+using System.Timers;
 using System.Transactions;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
@@ -25,6 +28,78 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //394. Decode String
+        //Given an encoded string, return its decoded string. The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times.Note that k is guaranteed to be a positive integer.
+        //You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc.Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k.For example, there will not be input like 3a or 2[4].
+        //The test cases are generated so that the length of the output will never exceed 105.
+        public static string DecodeString(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return string.Empty;
+
+            var parserStack = new Stack<string>();
+            var resultBuilder = new StringBuilder();
+
+            foreach (var chr in s)
+            {
+                if (chr != ']')
+                    parserStack.Push(chr.ToString());
+                else
+                {
+                    var repeatedBuilder = new StringBuilder();
+                    var numString = new StringBuilder();
+
+                    var shouldStop = parserStack.Count == 0;
+
+                    var foundRepeatedString = false;
+
+                    while (!shouldStop)
+                    {
+                        var parsedString = parserStack.Pop();
+
+                        //already calculated repeated substring.
+                        if (parsedString.Length > 1)
+                            repeatedBuilder.Insert(0, parsedString);
+                        else
+                        {
+                            var repeatedChr = parsedString[0];
+
+                            if (char.IsLetter(repeatedChr))
+                                repeatedBuilder.Insert(0, repeatedChr);
+                            else if (repeatedChr == '[')
+                                foundRepeatedString = true;
+                            else
+                                numString.Insert(0, repeatedChr);
+                        }
+
+                        shouldStop = parserStack.Count == 0 || (foundRepeatedString && parserStack.TryPeek(out var top) && (char.IsLetter(top[0]) || top[0] == '['));
+                    }
+
+                    var part = repeatedBuilder.ToString();
+                    repeatedBuilder.Clear();
+                    for (var repeat = 1; repeat <= Convert.ToInt32(numString.ToString()); repeat++)
+                    {
+                        repeatedBuilder.Append(part);
+                    }
+
+                    if (parserStack.Count == 0)
+                        resultBuilder.Append(repeatedBuilder.ToString());
+                    else
+                        parserStack.Push(repeatedBuilder.ToString());
+                }
+            }
+
+            var remainingStr = string.Empty;
+            while (parserStack.Count != 0)
+            {
+                remainingStr = parserStack.Pop() + remainingStr;
+            }
+
+            resultBuilder.Append(remainingStr);
+
+            return resultBuilder.ToString();
+        }
+
         //299. Bulls and Cows
         //You are playing the Bulls and Cows game with your friend.
         //You write down a secret number and ask your friend to guess what the number is. When your friend makes a guess, you provide a hint with the following info:
