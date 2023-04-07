@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Globalization;
@@ -28,6 +29,136 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //54. Spiral Matrix
+        //Given an m x n matrix, return all elements of the matrix in spiral order.
+        public static IList<int> SpiralOrder(int[][] matrix)
+        {
+            //validations
+
+            var spiralOrder = new List<int>();
+
+            //setup high and low limit of matrix traversal
+            var colLowLimit = 0;
+            var colHighLimit = matrix[0].Length - 1;
+            var rowLowLimit = 0;
+            var rowHighLimit = matrix.Length - 1;
+
+            static void doSpiral(int rowStart, int colStart, int colLowLimit, int colHighLimit, int rowLowLimit, int rowHighLimit, int[][] matrix, List<int> spiralOrder)
+            {
+                if (rowLowLimit > rowHighLimit || colLowLimit > colHighLimit)
+                    return;
+
+                int col;
+                for (col = colStart; col <= colHighLimit; col++)
+                {
+                    spiralOrder.Add(matrix[rowStart][col]);
+                }
+
+                int row;
+                for (row = rowStart + 1; row <= rowHighLimit; row++)
+                {
+                    spiralOrder.Add(matrix[row][colHighLimit]);
+                }
+
+                for (col = colHighLimit - 1; col >= colLowLimit && rowLowLimit != rowHighLimit; col--)
+                {
+                    spiralOrder.Add(matrix[rowHighLimit][col]);
+                }
+
+                for (row = rowHighLimit - 1; row > rowLowLimit && colLowLimit != colHighLimit; row--)
+                {
+                    spiralOrder.Add(matrix[row][colStart]);
+                }
+
+                doSpiral(rowStart + 1, colStart + 1, colLowLimit + 1, colHighLimit - 1, rowLowLimit + 1, rowHighLimit - 1, matrix, spiralOrder);
+            }
+
+            doSpiral(0, 0, colLowLimit, colHighLimit, rowLowLimit, rowHighLimit, matrix, spiralOrder);
+
+            return spiralOrder;
+        }
+
+        //202. Happy Number
+        //Write an algorithm to determine if a number n is happy.
+        //A happy number is a number defined by the following process:
+        //  Starting with any positive integer, replace the number by the sum of the squares of its digits.
+        //  Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.
+        //  Those numbers for which this process ends in 1 are happy.
+        //Return true if n is a happy number, and false if not.
+        public static bool IsHappy(int n)
+        {
+            //validations
+
+            var seenNums = new HashSet<int>();
+
+            static int sumOfSquares(int num)
+            {
+                var sum = 0;
+                var numString = num.ToString();
+                foreach (var chr in numString)
+                {
+                    var digit = (int)char.GetNumericValue(chr);
+                    sum += digit * digit;
+                }
+
+                return sum;
+            }
+
+            while (true)
+            {
+                if (seenNums.Contains(n))
+                    return false;
+
+                if (n == 1)
+                    return true;
+
+                seenNums.Add(n);
+
+                n = sumOfSquares(n);
+            }
+        }
+
+        //A palindromic number reads the same both ways.
+        //The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 × 99.
+        //Find the largest palindrome made from the product of two 3-digit numbers.
+        //580085
+        public static string LargestPalindrome()
+        {
+            //var num1 = 999;
+
+            string ReverseString(string input)
+            {
+                var builder = new StringBuilder();
+
+                for (var idx = input.Length - 1; idx > -1; idx--)
+                {
+                    builder.Append(input[idx]);
+                }
+
+                return builder.ToString();
+            }
+
+            var maxPalindrome = int.MinValue;
+
+            for (var num2 = 999; num2 >= 100; num2--)
+            {
+                for (var num1 = 999; num1 >= 100; num1--)
+                {
+                    var product = num1 * num2;
+                    var productString = product.ToString();
+                    var reverseProduct = ReverseString(productString);
+
+                    if (productString == reverseProduct)
+                    {
+                        if (product > maxPalindrome)
+                            maxPalindrome = product;
+                    }
+                }
+            }
+
+            return maxPalindrome.ToString();
+        }
+
         //394. Decode String
         //Given an encoded string, return its decoded string. The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times.Note that k is guaranteed to be a positive integer.
         //You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc.Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k.For example, there will not be input like 3a or 2[4].
