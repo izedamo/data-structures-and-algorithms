@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Numerics;
 using System.Reflection;
 using System.Security;
 using System.Text;
@@ -29,6 +30,72 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        //43. Multiply Strings
+        //Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.
+        //Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.
+        public static string Multiply(string num1, string num2)
+        {
+            if (num1 == "0" || num2 == "0")
+                return "0";
+
+            //stores digits of the multiplication result
+            var result = new int[num1.Length + num2.Length];
+
+            for (var idx_1 = num1.Length - 1; idx_1 >= 0; idx_1--)
+            {
+                var digit_1 = (int)char.GetNumericValue(num1[idx_1]);
+
+                for (var idx_2 = num2.Length - 1; idx_2 >= 0; idx_2--)
+                {
+                    var digit_2 = (int)char.GetNumericValue(num2[idx_2]);
+                    var intermediateResult = digit_1 * digit_2;
+
+                    result[idx_1 + idx_2 + 1] += intermediateResult;
+                    result[idx_1 + idx_2] += result[idx_1 + idx_2 + 1] / 10;
+                    result[idx_1 + idx_2 + 1] = result[idx_1 + idx_2 + 1] % 10;
+                }
+            }
+
+            return string.Join("", result.SkipWhile(d => d == 0));
+        }
+
+        //14. Longest Common Prefix
+        //Write a function to find the longest common prefix string amongst an array of strings.
+        //If there is no common prefix, return an empty string "".
+        public static string LongestCommonPrefix(string[] strs)
+        {
+            //validations
+            if (strs == null || strs.Length == 0)
+                return string.Empty;
+            if (strs.Length == 1)
+                return strs[0];
+
+            var longestCommonPrefix = strs[0];
+
+            for (var idx = 1; idx < strs.Length; idx++)
+            {
+                var word = strs[idx];
+
+                //if (word.Length < longestCommonPrefix.Length)
+                //    longestCommonPrefix = word;
+
+                var builder = new StringBuilder();
+                for (var idx_char = 0; idx_char < Math.Min(longestCommonPrefix.Length, word.Length); idx_char++)
+                {
+                    if (longestCommonPrefix[idx_char] == word[idx_char])
+                        builder.Append(longestCommonPrefix[idx_char]);
+                    else
+                        break;
+                }
+                if (builder.Length == 0)
+                    return string.Empty;
+                else
+                    longestCommonPrefix = builder.ToString();
+            }
+
+            return longestCommonPrefix;
+        }
+
         //54. Spiral Matrix
         //Given an m x n matrix, return all elements of the matrix in spiral order.
         public static IList<int> SpiralOrder(int[][] matrix)

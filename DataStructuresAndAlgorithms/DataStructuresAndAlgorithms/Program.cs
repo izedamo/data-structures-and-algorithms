@@ -11,7 +11,9 @@ namespace DataStructuresAndAlgorithms
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(LeetCode.SpiralOrder(new int[][] { new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 11, 12 } }));
+            Console.WriteLine(LeetCode.Multiply("2", "2"));
+
+            //Console.WriteLine(LeetCode.SpiralOrder(new int[][] { new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 11, 12 } }));
 
             //Console.WriteLine(LeetCode.IsHappy(19));
 
