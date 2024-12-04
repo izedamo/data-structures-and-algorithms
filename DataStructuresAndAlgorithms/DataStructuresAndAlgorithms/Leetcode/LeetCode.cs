@@ -23,6 +23,7 @@ using System.Threading;
 using System.Timers;
 using System.Transactions;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Reflection.Metadata.BlobBuilder;
 
@@ -30,6 +31,718 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        /*
+        22. Generate Parentheses
+        
+        https://leetcode.com/problems/generate-parentheses/description/
+
+        Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+        */
+        public static IList<string> GenerateParenthesis(int n)
+        {
+            //validations here.
+
+            //can only add open parenthesis if open count < n.
+            //can only add close parenthesis if close count < open count.
+            //must stop when open == close == n.
+
+            IList<string> combinations = new List<string>();
+            var stack = new Stack<string>();
+
+            void Backtrack(int open, int close)
+            {
+                if (open == close && open == n)
+                {
+                    var combination = string.Empty;
+
+                    combination += string.Join("", stack.Reverse());
+
+                    combinations.Add(combination);
+                    return;
+                }
+
+                if (open < n)
+                {
+                    stack.Push("(");
+                    Backtrack(open + 1, close);
+                    stack.Pop();
+                }
+
+                if (close < open)
+                {
+                    stack.Push(")");
+                    Backtrack(open, close + 1);
+                    stack.Pop();
+                }
+            }
+
+            Backtrack(0, 0);
+
+            return combinations;
+        }
+
+        /*
+        150. Evaluate Reverse Polish Notation
+        
+        https://leetcode.com/problems/evaluate-reverse-polish-notation/description/
+
+        You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+
+        Evaluate the expression. Return an integer that represents the value of the expression.
+
+        Note that:
+
+            The valid operators are '+', '-', '*', and '/'.
+            Each operand may be an integer or another expression.
+            The division between two integers always truncates toward zero.
+            There will not be any division by zero.
+            The input represents a valid arithmetic expression in a reverse polish notation.
+            The answer and all the intermediate calculations can be represented in a 32-bit integer.
+        */
+        public static int EvalRPN(string[] tokens)
+        {
+            //validations here.
+
+            var stack = new Stack<int>();
+            var operators = new HashSet<string>() { "+", "-", "*", "/" };
+            foreach (var token in tokens)
+            {
+                if (operators.Contains(token))
+                {
+                    //perform operation and push result to stack.
+                    var num2 = stack.Pop();
+                    var num1 = stack.Pop();
+
+                    if (token == "+")
+                        stack.Push(num1 + num2);
+                    else if (token == "-")
+                        stack.Push(num1 - num2);
+                    else if (token == "*")
+                        stack.Push(num1 * num2);
+                    else
+                        stack.Push(num1 / num2);
+                }
+                else
+                {
+                    //push operand to stack.
+                    stack.Push(int.Parse(token));
+                }
+            }
+
+            return stack.Pop();
+        }
+
+        /*
+        11. Container With Most Water
+
+        https://leetcode.com/problems/container-with-most-water/description/
+
+        You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).
+
+        Find two lines that together with the x-axis form a container, such that the container contains the most water.
+
+        Return the maximum amount of water a container can store.
+
+        Notice that you may not slant the container.
+        */
+        public static int MaxArea(int[] height)
+        {
+            //validations here.
+
+            var l = 0;
+            var r = height.Length - 1;
+            var maxArea = 0;
+
+            while (l < r)
+            {
+                var area = Math.Min(height[l], height[r]) * (r - l);
+
+                if (area > maxArea)
+                {
+                    maxArea = area;
+                }
+
+                if (height[l] < height[r])
+                {
+                    //if height limited by left side then try to increase it.
+                    l += 1;
+                }
+                else
+                {
+                    r -= 1;
+                }
+            }
+
+            return maxArea;
+        }
+
+        /*
+        15. 3Sum
+        
+        https://leetcode.com/problems/3sum/description/
+
+        Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+        Notice that the solution set must not contain duplicate triplets.
+        */
+        public static IList<IList<int>> ThreeSum(int[] nums)
+        {
+            //validations here.
+
+            //find a + b + c = 0;
+
+            //sort array to avoid duplicate triplets
+            Array.Sort(nums); // O(nlogn)
+            int? prev = null;
+
+            IList<IList<int>> triplets = new List<IList<int>>();
+            for (var idx = 0; idx < nums.Length; idx++) // O(n)
+            {
+                var a = nums[idx];
+
+                if (a == prev)
+                    continue;
+
+                var l = idx + 1;
+                var r = nums.Length - 1;
+
+                while (l < r)
+                { // O(n)
+                    var threeSum = a + nums[l] + nums[r];
+
+                    if (threeSum == 0)
+                    {
+                        //add triplet to result.
+                        triplets.Add(new List<int> { a, nums[l], nums[r] });
+
+                        l += 1;
+                        //go to next non-duplicate number so that we don't add a duplicate to the list.
+                        while (l < r && nums[l] == nums[l - 1])
+                        {
+                            l += 1;
+                        }
+                    }
+                    else if (threeSum > 0)
+                    {
+                        r -= 1;
+                    }
+                    else
+                    {
+                        l += 1;
+                    }
+                }
+
+                prev = a;
+            }
+
+            return triplets;
+        }
+
+        /*
+        167. Two Sum II - Input Array Is Sorted
+        
+        https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/
+
+        Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
+
+        Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
+
+        The tests are generated such that there is exactly one solution. You may not use the same element twice.
+
+        Your solution must use only constant extra space.
+        */
+        public static int[] TwoSum2(int[] numbers, int target)
+        {
+            //validations here.
+
+            var l = 0;
+            var r = numbers.Length - 1;
+
+            while (l < r)
+            {
+                var sum = numbers[l] + numbers[r];
+
+                if (sum == target)
+                    return new int[] { l + 1, r + 1 };
+
+                if (sum > target)
+                    r -= 1;
+                else
+                    l += 1;
+            }
+
+            return new int[] { 0, 0 };
+        }
+
+        /*
+        128. Longest Consecutive Sequence
+
+        https://leetcode.com/problems/longest-consecutive-sequence/description/
+
+        Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+        You must write an algorithm that runs in O(n) time.
+        */
+        public static int LongestConsecutive(int[] nums)
+        {
+            //validations here.
+
+            var numSet = new HashSet<int>(nums);
+
+            var longestLength = 0;
+
+            foreach (var num in numSet)
+            {
+                if (numSet.Contains(num - 1))
+                    continue;
+
+                var sequenceLength = 1;
+
+                var nextNum = num + 1;
+                while (numSet.Contains(nextNum))
+                {
+                    sequenceLength += 1;
+                    nextNum += 1;
+                }
+
+                if (sequenceLength > longestLength)
+                    longestLength = sequenceLength;
+            }
+
+            return longestLength;
+        }
+
+        /*
+        36. Valid Sudoku
+
+        https://leetcode.com/problems/valid-sudoku/description/
+
+        Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+        Each row must contain the digits 1-9 without repetition.
+        Each column must contain the digits 1-9 without repetition.
+        Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+        */
+        public static bool IsValidSudoku(char[][] board)
+        {
+            //validations here.
+
+            //row and col validation
+            for (var idx = 0; idx < 9; idx++)
+            {
+                var seenDigits = new HashSet<char>();
+
+                foreach (var digit in board[idx])
+                {
+                    if (digit == '.')
+                        continue;
+                    if (seenDigits.Contains(digit))
+                        return false;
+
+                    seenDigits.Add(digit);
+                }
+
+                seenDigits.Clear();
+
+                for (var colIdx = 0; colIdx < 9; colIdx++)
+                {
+                    var digit = board[colIdx][idx];
+                    if (digit == '.')
+                        continue;
+                    if (seenDigits.Contains(digit))
+                        return false;
+
+                    seenDigits.Add(digit);
+                }
+            }
+
+            //3x3 validation
+            var ranges = new HashSet<(int, int)> { (0, 3), (3, 6), (6, 9) };
+
+            foreach (var range in ranges)
+            {
+                var grid1Digits = new HashSet<int>();
+                var grid2Digits = new HashSet<int>();
+                var grid3Digits = new HashSet<int>();
+                for (var rowIdx = range.Item1; rowIdx < range.Item2; rowIdx++)
+                {
+                    for (var colIdx = 0; colIdx < 9; colIdx++)
+                    {
+                        var digit = board[rowIdx][colIdx];
+                        if (digit == '.')
+                            continue;
+
+                        if (colIdx < 3)
+                        {
+                            if (grid1Digits.Contains(digit))
+                                return false;
+
+                            grid1Digits.Add(digit);
+                        }
+                        else if (colIdx < 6)
+                        {
+                            if (grid2Digits.Contains(digit))
+                                return false;
+
+                            grid2Digits.Add(digit);
+                        }
+                        else
+                        {
+                            if (grid3Digits.Contains(digit))
+                                return false;
+
+                            grid3Digits.Add(digit);
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /*
+        347. Top K Frequent Elements
+
+        https://leetcode.com/problems/top-k-frequent-elements/description/
+        
+        Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+        */
+        public static int[] TopKFrequent(int[] nums, int k)
+        {
+            //validations here.
+
+            var numFreqMap = new Dictionary<int, int>();
+            var maxNumFreq = 0;
+
+            //find freq of each num and also the max frequency.
+            foreach (var num in nums)
+            {
+                if (numFreqMap.ContainsKey(num))
+                {
+                    numFreqMap[num] += 1;
+                }
+                else
+                {
+                    numFreqMap.Add(num, 1);
+                }
+
+                if (numFreqMap[num] > maxNumFreq)
+                {
+                    maxNumFreq = numFreqMap[num];
+                }
+            }
+
+            var freqNumMap = new Dictionary<int, List<int>>();
+
+            foreach (var kv in numFreqMap)
+            {
+                if (freqNumMap.ContainsKey(kv.Value))
+                {
+                    freqNumMap[kv.Value].Add(kv.Key);
+                }
+                else
+                {
+                    freqNumMap.Add(kv.Value, new List<int> { kv.Key });
+                }
+            }
+
+            var mostFrequentItems = new List<int>();
+
+            var itemCount = 0;
+            var freq = maxNumFreq;
+            while (itemCount < k)
+            {
+                if (freqNumMap.ContainsKey(freq))
+                {
+                    foreach (var num in freqNumMap[freq])
+                    {
+                        mostFrequentItems.Add(num);
+                        itemCount++;
+                    }
+                }
+                freq--;
+            }
+
+            return mostFrequentItems.ToArray();
+        }
+
+        /*
+        49. Group Anagrams
+
+        https://leetcode.com/problems/group-anagrams/description/
+
+        Given an array of strings strs, group the
+        anagrams together. You can return the answer in any order.
+        */
+        public static IList<IList<string>> GroupAnagrams(string[] strs)
+        {
+            //validations here.
+
+            static string SortedStringFor(string input)
+            {
+                var chars = input.ToCharArray();
+                Array.Sort(chars);
+                return new string(chars);
+            }
+
+            IList<IList<string>> groups = new List<IList<string>>();
+            var anagramMap = new Dictionary<string, IList<string>>();
+
+            foreach (var str in strs) // O(m) operation where m = length of input array.
+            {
+                var sortedString = SortedStringFor(str); //nlogn operation where n = length of string.
+
+                if (anagramMap.ContainsKey(sortedString))
+                {
+                    anagramMap[sortedString].Add(str);
+                }
+                else
+                {
+                    anagramMap.Add(sortedString, new List<string> { str });
+                }
+            }
+
+            foreach (var kv in anagramMap)
+            {
+                groups.Add(kv.Value);
+            }
+
+            return groups;
+        }
+
+        /*
+        125. Valid Palindrome
+
+        A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+        Given a string s, return true if it is a palindrome, or false otherwise.
+        */
+        public static bool IsPalindrome(string s)
+        {
+            if (s == null || s.Length <= 1)
+                return true;
+
+            var l = 0;
+            var r = s.Length - 1;
+
+            while (l < r)
+            {
+                if (!char.IsLetterOrDigit(s[l]))
+                {
+                    l++;
+                    continue;
+                }
+
+                if (!char.IsLetterOrDigit(s[r]))
+                {
+                    r--;
+                    continue;
+                }
+
+                if (char.ToLower(s[l]) != char.ToLower(s[r]))
+                    return false;
+
+                l++;
+                r--;
+            }
+
+            return true;
+        }
+
+        /*
+        80. Remove Duplicates from Sorted Array II
+        https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
+
+        Given an integer array nums sorted in non-decreasing order, remove some duplicates in-place such that each unique element appears at most twice. The relative order of the elements should be kept the same.
+
+        Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
+
+        Return k after placing the final result in the first k slots of nums.
+
+        Do not allocate extra space for another array. You must do this by modifying the input array in-place with O(1) extra memory.
+
+        Custom Judge:
+
+        The judge will test your solution with the following code:
+
+        int[] nums = [...]; // Input array
+        int[] expectedNums = [...]; // The expected answer with correct length
+
+        int k = removeDuplicates(nums); // Calls your implementation
+
+        assert k == expectedNums.length;
+        for (int i = 0; i < k; i++) {
+            assert nums[i] == expectedNums[i];
+        }
+
+        If all assertions pass, then your solution will be accepted.
+
+        Example 1:
+
+        Input: nums = [1,1,1,2,2,3]
+        Output: 5, nums = [1,1,2,2,3,_]
+        Explanation: Your function should return k = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+        It does not matter what you leave beyond the returned k (hence they are underscores).
+
+        Example 2:
+
+        Input: nums = [0,0,1,1,1,1,2,3,3]
+        Output: 7, nums = [0,0,1,1,2,3,3,_,_]
+        Explanation: Your function should return k = 7, with the first seven elements of nums being 0, 0, 1, 1, 2, 3 and 3 respectively.
+        It does not matter what you leave beyond the returned k (hence they are underscores).
+        
+        Constraints:
+
+            1 <= nums.length <= 3 * 104
+            -104 <= nums[i] <= 104
+            nums is sorted in non-decreasing order.
+        */
+        public static int RemoveDuplicates(int[] nums)
+        {
+            if (nums.Length <= 2)
+                return nums.Length;
+
+            var prev = nums[0];
+            var replacePtr = 2;
+            var seenCount = 1;
+
+            var answer = 1;
+
+            for (var idx = 1; idx < nums.Length; idx++)
+            {
+                var current = nums[idx];
+
+                if (current == prev)
+                {
+                    seenCount++;
+
+                    if (seenCount == 3)
+                    {
+                        replacePtr = idx;
+                        answer += 2;
+                    }
+                }
+                else if (seenCount <= 2)
+                {
+                    prev = current;
+                    seenCount = 1;
+                    answer += 2;
+                }
+                else
+                {
+                    nums[replacePtr] = current;
+                    prev = current;
+                    replacePtr++;
+                    seenCount = 1;
+                    answer += 1;
+                }
+            }
+            Console.WriteLine(string.Join(',', nums));
+            return replacePtr;
+            // return answer;
+        }
+
+        //13. Roman to Integer
+        /*
+        Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
+
+        Symbol       Value
+        I             1
+        V             5
+        X             10
+        L             50
+        C             100
+        D             500
+        M             1000
+
+        For example, 2 is written as II in Roman numeral, just two ones added together. 12 is written as XII, which is simply X + II. The number 27 is written as XXVII, which is XX + V + II.
+
+        Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making four. The same principle applies to the number nine, which is written as IX. There are six instances where subtraction is used:
+
+            I can be placed before V (5) and X (10) to make 4 and 9.
+            X can be placed before L (50) and C (100) to make 40 and 90.
+            C can be placed before D (500) and M (1000) to make 400 and 900.
+
+        Given a roman numeral, convert it to an integer.
+        */
+        public static int RomanToInt(string s)
+        {
+            //do normal validations here.
+
+            var map = new Dictionary<string, int>
+            {
+                { "I", 1 },
+                { "V", 5 },
+                { "IV", 4 },
+                { "X", 10 },
+                { "IX", 9 },
+                { "L", 50 },
+                { "XL", 40 },
+                { "C", 100 },
+                { "XC", 90 },
+                { "D", 500 },
+                { "CD", 400 },
+                { "M", 1000 },
+                { "CM", 900 },
+            };
+            var prev = char.MinValue;
+            var num = 0;
+            var subs = new HashSet<char> { 'I', 'X', 'C' };
+            foreach (char current in s)
+            {
+                if (map.ContainsKey(char.ToString(prev) + char.ToString(current)))
+                {
+                    num =
+                        num
+                        - map[char.ToString(prev)]
+                        + map[char.ToString(prev) + char.ToString(current)];
+                }
+                else
+                {
+                    num += map[char.ToString(current)];
+                }
+
+                prev = current;
+            }
+
+            return num;
+        }
+
+        //9. Palindrome Number
+        //Given an integer x, return true if x is a palindrome, and false otherwise. Could you solve it without converting the integer to a string?
+        public static bool IsPalindrome(int x)
+        {
+            if (x < 0)
+                return false;
+
+            if (x < 10)
+                return true;
+
+            var digits = new List<int> { };
+
+            var quotient = x / 10;
+            var remainder = x % 10;
+            digits.Add(remainder);
+            while (quotient >= 10)
+            {
+                remainder = quotient % 10;
+                digits.Add(remainder);
+
+                quotient /= 10;
+            }
+
+            digits.Add(quotient);
+
+            int reverseNum = 0;
+            for (var idx = digits.Count - 1; idx >= 0; idx--)
+            {
+                reverseNum +=
+                    (Convert.ToInt32(Math.Pow(10, digits.Count - (idx + 1)))) * digits[idx];
+            }
+
+            return reverseNum == x;
+        }
+
         //43. Multiply Strings
         //Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.
         //Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.
@@ -80,7 +793,11 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 //    longestCommonPrefix = word;
 
                 var builder = new StringBuilder();
-                for (var idx_char = 0; idx_char < Math.Min(longestCommonPrefix.Length, word.Length); idx_char++)
+                for (
+                    var idx_char = 0;
+                    idx_char < Math.Min(longestCommonPrefix.Length, word.Length);
+                    idx_char++
+                )
                 {
                     if (longestCommonPrefix[idx_char] == word[idx_char])
                         builder.Append(longestCommonPrefix[idx_char]);
@@ -110,7 +827,16 @@ namespace DataStructuresAndAlgorithms.Leetcode
             var rowLowLimit = 0;
             var rowHighLimit = matrix.Length - 1;
 
-            static void doSpiral(int rowStart, int colStart, int colLowLimit, int colHighLimit, int rowLowLimit, int rowHighLimit, int[][] matrix, List<int> spiralOrder)
+            static void doSpiral(
+                int rowStart,
+                int colStart,
+                int colLowLimit,
+                int colHighLimit,
+                int rowLowLimit,
+                int rowHighLimit,
+                int[][] matrix,
+                List<int> spiralOrder
+            )
             {
                 if (rowLowLimit > rowHighLimit || colLowLimit > colHighLimit)
                     return;
@@ -127,20 +853,46 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     spiralOrder.Add(matrix[row][colHighLimit]);
                 }
 
-                for (col = colHighLimit - 1; col >= colLowLimit && rowLowLimit != rowHighLimit; col--)
+                for (
+                    col = colHighLimit - 1;
+                    col >= colLowLimit && rowLowLimit != rowHighLimit;
+                    col--
+                )
                 {
                     spiralOrder.Add(matrix[rowHighLimit][col]);
                 }
 
-                for (row = rowHighLimit - 1; row > rowLowLimit && colLowLimit != colHighLimit; row--)
+                for (
+                    row = rowHighLimit - 1;
+                    row > rowLowLimit && colLowLimit != colHighLimit;
+                    row--
+                )
                 {
                     spiralOrder.Add(matrix[row][colStart]);
                 }
 
-                doSpiral(rowStart + 1, colStart + 1, colLowLimit + 1, colHighLimit - 1, rowLowLimit + 1, rowHighLimit - 1, matrix, spiralOrder);
+                doSpiral(
+                    rowStart + 1,
+                    colStart + 1,
+                    colLowLimit + 1,
+                    colHighLimit - 1,
+                    rowLowLimit + 1,
+                    rowHighLimit - 1,
+                    matrix,
+                    spiralOrder
+                );
             }
 
-            doSpiral(0, 0, colLowLimit, colHighLimit, rowLowLimit, rowHighLimit, matrix, spiralOrder);
+            doSpiral(
+                0,
+                0,
+                colLowLimit,
+                colHighLimit,
+                rowLowLimit,
+                rowHighLimit,
+                matrix,
+                spiralOrder
+            );
 
             return spiralOrder;
         }
@@ -270,7 +1022,13 @@ namespace DataStructuresAndAlgorithms.Leetcode
                                 numString.Insert(0, repeatedChr);
                         }
 
-                        shouldStop = parserStack.Count == 0 || (foundRepeatedString && parserStack.TryPeek(out var top) && (char.IsLetter(top[0]) || top[0] == '['));
+                        shouldStop =
+                            parserStack.Count == 0
+                            || (
+                                foundRepeatedString
+                                && parserStack.TryPeek(out var top)
+                                && (char.IsLetter(top[0]) || top[0] == '[')
+                            );
                     }
 
                     var part = repeatedBuilder.ToString();
@@ -772,7 +1530,12 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 if (memo.TryGetValue(step, out var result))
                     return result;
 
-                memo[step] = cost[step] + Math.Min(step + 1 < cost.Length ? minCost(step + 1) : 0, step + 2 < cost.Length ? minCost(step + 2) : 0);
+                memo[step] =
+                    cost[step]
+                    + Math.Min(
+                        step + 1 < cost.Length ? minCost(step + 1) : 0,
+                        step + 2 < cost.Length ? minCost(step + 2) : 0
+                    );
 
                 return memo[step];
             }
@@ -788,11 +1551,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
             if (n <= 0)
                 return 0;
 
-            var memo = new Dictionary<int, int>
-            {
-                { 1, 1 },
-                { 2, 2 }
-            };
+            var memo = new Dictionary<int, int> { { 1, 1 }, { 2, 2 } };
 
             int WaysToClimb(int steps)
             {
@@ -820,11 +1579,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
             if (n < 0)
                 return -1;
 
-            var fibs = new Dictionary<int, int>
-            {
-                { 0, 0 },
-                { 1, 1 }
-            };
+            var fibs = new Dictionary<int, int> { { 0, 0 }, { 1, 1 } };
 
             int fib(int num)
             {
@@ -929,12 +1684,11 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 left = node.left == null ? null : minMaxAndValidation(node.left);
                 right = node.right == null ? null : minMaxAndValidation(node.right);
 
-                var isValidSubtree = (left.HasValue ? left.Value.Item1 && left.Value.Item3 < node.val : true) && (right.HasValue ? node.val < right.Value.Item2 && right.Value.Item1 : true);
+                var isValidSubtree =
+                    (left.HasValue ? left.Value.Item1 && left.Value.Item3 < node.val : true)
+                    && (right.HasValue ? node.val < right.Value.Item2 && right.Value.Item1 : true);
 
-                var minMax = new List<int>
-                {
-                    node.val
-                };
+                var minMax = new List<int> { node.val };
                 if (left.HasValue)
                 {
                     minMax.Add(left.Value.Item2);
@@ -962,10 +1716,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 return levelOrder;
 
             var levels = new Queue<IList<TreeNode>>();
-            levels.Enqueue(new List<TreeNode>
-            {
-                root
-            });
+            levels.Enqueue(new List<TreeNode> { root });
 
             while (levels.Count > 0)
             {
@@ -1145,8 +1896,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     {
                         slow = slow.next;
                         cycleLength++;
-                    }
-                    while (slow != fast);
+                    } while (slow != fast);
                     break;
                 }
             }
@@ -1220,7 +1970,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
         // Time = O(n) | Space = O(1)
         public static ListNode ReverseListIterative(ListNode head)
         {
-            if (head == null) return null;
+            if (head == null)
+                return null;
 
             ListNode prev = null;
             ListNode next = null;
@@ -1244,7 +1995,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Out of Memory error.
         public static ListNode ReverseList(ListNode head)
         {
-            if (head == null) return null;
+            if (head == null)
+                return null;
 
             var nodes = new Stack<ListNode>();
             while (head != null)
@@ -1322,7 +2074,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
         {
             if (s == null || t == null || s.Length > t.Length)
                 return false;
-            if (s.Equals(string.Empty)) return true;
+            if (s.Equals(string.Empty))
+                return true;
 
             var s_idx = 0;
 
@@ -1331,7 +2084,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 if (chr == s[s_idx])
                     s_idx++;
 
-                if (s_idx == s.Length) return true;
+                if (s_idx == s.Length)
+                    return true;
             }
 
             return false;
@@ -1342,7 +2096,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Two strings s and t are isomorphic if the characters in s can be replaced to get t. All occurrences of a character must be replaced with another character while preserving the order of characters.No two characters may map to the same character, but a character may map to itself.
         public static bool IsIsomorphic(string s, string t)
         {
-            if (s.Length != t.Length) return false;
+            if (s.Length != t.Length)
+                return false;
 
             var s2tMap = new Dictionary<char, char>();
             var t2sMap = new Dictionary<char, char>();
@@ -1357,7 +2112,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 {
                     var char_Replaced = s2tMap[char_S];
 
-                    if (char_Replaced != char_T) return false;
+                    if (char_Replaced != char_T)
+                        return false;
                 }
 
                 //check char_T has previously been mapped to a char in S.
@@ -1365,7 +2121,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 {
                     var mapped_SChar = t2sMap[char_T];
 
-                    if (mapped_SChar != char_S) return false;
+                    if (mapped_SChar != char_S)
+                        return false;
                 }
 
                 s2tMap[char_S] = char_T;
@@ -1380,7 +2137,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //The pivot index is the index where the sum of all the numbers strictly to the left of the index is equal to the sum of all the numbers strictly to the index's right. If the index is on the left edge of the array, then the left sum is 0 because there are no elements to the left.This also applies to the right edge of the array. Return the leftmost pivot index.If no such index exists, return -1.
         public static int PivotIndex(int[] nums)
         {
-            if (nums == null || nums.Length == 0 || nums.Length == 1) return 0;
+            if (nums == null || nums.Length == 0 || nums.Length == 1)
+                return 0;
 
             var leftSum = 0;
             var rightSum = nums.Sum();
@@ -1394,7 +2152,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
                 rightSum -= nums[idx];
 
-                if (leftSum == rightSum) return idx;
+                if (leftSum == rightSum)
+                    return idx;
             }
 
             return -1;
@@ -1644,7 +2403,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                         countOne++;
                     }
                 }
-
                 //change from 0 -> 1 or 1 -> 0.
                 else
                 {
@@ -1735,7 +2493,6 @@ namespace DataStructuresAndAlgorithms.Leetcode
                     if (AColConnects[colIdx] == 3)
                         return "A";
                 }
-
                 //B's turn.
                 else
                 {
@@ -1769,7 +2526,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             if (movesRemaining > 0)
                 return "Pending";
-            else return "Draw";
+            else
+                return "Draw";
         }
 
         public static int MaximumUnits(int[][] boxTypes, int truckSize)
@@ -1817,7 +2575,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
             var sLetters = GetLettersDict(s);
             var tLetters = GetLettersDict(t);
 
-            if (sLetters.Count != tLetters.Count) return false;
+            if (sLetters.Count != tLetters.Count)
+                return false;
 
             foreach (var kv in sLetters)
             {
@@ -1896,7 +2655,13 @@ namespace DataStructuresAndAlgorithms.Leetcode
         public static bool Exist(char[][] board, string word)
         {
             //validations.
-            if (board == null || board.Length == 0 || word == null || word.Length == 0 || word.Length > board.Length * board[0].Length)
+            if (
+                board == null
+                || board.Length == 0
+                || word == null
+                || word.Length == 0
+                || word.Length > board.Length * board[0].Length
+            )
                 return false;
 
             var lastRowIdx = board.Length - 1;
@@ -1937,7 +2702,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                         {
                             var nextChar = word[ptr];
                             var position = currentSubStr.Peek();
-                            var row = position[0]; var col = position[1];
+                            var row = position[0];
+                            var col = position[1];
 
                             var belowRow = row + 1;
                             var aboveRow = row - 1;
@@ -1947,35 +2713,54 @@ namespace DataStructuresAndAlgorithms.Leetcode
                             if (!visitedPositions.ContainsKey(position))
                                 visitedPositions.Add(position, new HashSet<string>(4));
 
-                            if (belowRow <= lastRowIdx && !usedCharPostions.Contains($"{belowRow}:{col}") && !visitedPositions[position].Contains($"{belowRow}:{col}") && board[belowRow][col] == nextChar)
+                            if (
+                                belowRow <= lastRowIdx
+                                && !usedCharPostions.Contains($"{belowRow}:{col}")
+                                && !visitedPositions[position].Contains($"{belowRow}:{col}")
+                                && board[belowRow][col] == nextChar
+                            )
                             {
                                 currentSubStr.Push(new int[] { belowRow, col });
                                 usedCharPostions.Add($"{belowRow}:{col}");
                                 visitedPositions[position].Add($"{belowRow}:{col}");
                                 ptr++;
                             }
-                            else if (aboveRow >= 0 && !usedCharPostions.Contains($"{aboveRow}:{col}") && !visitedPositions[position].Contains($"{aboveRow}:{col}") && board[aboveRow][col] == nextChar)
+                            else if (
+                                aboveRow >= 0
+                                && !usedCharPostions.Contains($"{aboveRow}:{col}")
+                                && !visitedPositions[position].Contains($"{aboveRow}:{col}")
+                                && board[aboveRow][col] == nextChar
+                            )
                             {
                                 currentSubStr.Push(new int[] { aboveRow, col });
                                 usedCharPostions.Add($"{aboveRow}:{col}");
                                 visitedPositions[position].Add($"{aboveRow}:{col}");
                                 ptr++;
                             }
-                            else if (previousCol >= 0 && !usedCharPostions.Contains($"{row}:{previousCol}") && !visitedPositions[position].Contains($"{row}:{previousCol}") && board[row][previousCol] == nextChar)
+                            else if (
+                                previousCol >= 0
+                                && !usedCharPostions.Contains($"{row}:{previousCol}")
+                                && !visitedPositions[position].Contains($"{row}:{previousCol}")
+                                && board[row][previousCol] == nextChar
+                            )
                             {
                                 currentSubStr.Push(new int[] { row, previousCol });
                                 usedCharPostions.Add($"{row}:{previousCol}");
                                 visitedPositions[position].Add($"{row}:{previousCol}");
                                 ptr++;
                             }
-                            else if (nextCol <= lastColIdx && !usedCharPostions.Contains($"{row}:{nextCol}") && !visitedPositions[position].Contains($"{row}:{nextCol}") && board[row][nextCol] == nextChar)
+                            else if (
+                                nextCol <= lastColIdx
+                                && !usedCharPostions.Contains($"{row}:{nextCol}")
+                                && !visitedPositions[position].Contains($"{row}:{nextCol}")
+                                && board[row][nextCol] == nextChar
+                            )
                             {
                                 currentSubStr.Push(new int[] { row, nextCol });
                                 usedCharPostions.Add($"{row}:{nextCol}");
                                 visitedPositions[position].Add($"{row}:{nextCol}");
                                 ptr++;
                             }
-
                             //no connection found
                             else
                             {
@@ -2013,12 +2798,24 @@ namespace DataStructuresAndAlgorithms.Leetcode
                 var currentPosition = $"{row}:{col}";
 
                 //invalid indices
-                if (row > lastRowIdx || col > lastColIdx || row < 0 || col < 0 || board[row][col] != word[wordPtr] || usedPositions.Contains(currentPosition))
+                if (
+                    row > lastRowIdx
+                    || col > lastColIdx
+                    || row < 0
+                    || col < 0
+                    || board[row][col] != word[wordPtr]
+                    || usedPositions.Contains(currentPosition)
+                )
                     return false;
 
                 usedPositions.Add(currentPosition);
 
-                if (FindWord(row - 1, col, wordPtr + 1) || FindWord(row + 1, col, wordPtr + 1) || FindWord(row, col - 1, wordPtr + 1) || FindWord(row, col + 1, wordPtr + 1))
+                if (
+                    FindWord(row - 1, col, wordPtr + 1)
+                    || FindWord(row + 1, col, wordPtr + 1)
+                    || FindWord(row, col - 1, wordPtr + 1)
+                    || FindWord(row, col + 1, wordPtr + 1)
+                )
                     return true;
 
                 usedPositions.Remove(currentPosition);
@@ -2114,7 +2911,14 @@ namespace DataStructuresAndAlgorithms.Leetcode
             //utility function.
             void AddNeighborToQueue(int r, int c, Queue<(int, int)> queue)
             {
-                if (r >= 0 && r <= lastRow && c >= 0 && c <= lastCol && grid[r][c] == '1' && !visited.Contains((r, c)))
+                if (
+                    r >= 0
+                    && r <= lastRow
+                    && c >= 0
+                    && c <= lastCol
+                    && grid[r][c] == '1'
+                    && !visited.Contains((r, c))
+                )
                 {
                     visited.Add((r, c));
                     queue.Enqueue((r, c));
@@ -2172,7 +2976,14 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             void VisitAdjacentLand(int row, int col, Queue<(int, int)> queue)
             {
-                if (row < 0 || row >= rowLength || col < 0 || col >= columnLength || visitedLandAreas.Contains((row, col)) || grid[row][col] != '1')
+                if (
+                    row < 0
+                    || row >= rowLength
+                    || col < 0
+                    || col >= columnLength
+                    || visitedLandAreas.Contains((row, col))
+                    || grid[row][col] != '1'
+                )
                     return;
 
                 visitedLandAreas.Add((row, col));
@@ -2205,7 +3016,8 @@ namespace DataStructuresAndAlgorithms.Leetcode
                             VisitAdjacentLand(r, c - 1, landAreas);
                         }
                     }
-                    else continue;
+                    else
+                        continue;
                 }
             }
 
@@ -2227,18 +3039,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
             //hold digit logs.
             var digitLogs = new List<string>();
 
-            var digitSet = new HashSet<char> {
-            '0',
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9'
-        };
+            var digitSet = new HashSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
             //letter log comparer.
             static int CompareLogs(string log1, string log2)
@@ -2442,7 +3243,9 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             fillGlasses(poured, 0, 0);
 
-            return glasses.ContainsKey($"{query_row}:{query_glass}") ? glasses[$"{query_row}:{query_glass}"] : 0;
+            return glasses.ContainsKey($"{query_row}:{query_glass}")
+                ? glasses[$"{query_row}:{query_glass}"]
+                : 0;
         }
 
         //799. Champagne Tower

@@ -1,9 +1,9 @@
-﻿using DataStructuresAndAlgorithms.DataStructures;
-using DataStructuresAndAlgorithms.DataStructures.Trees;
-using DataStructuresAndAlgorithms.Leetcode;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using DataStructuresAndAlgorithms.DataStructures;
+using DataStructuresAndAlgorithms.DataStructures.Trees;
+using DataStructuresAndAlgorithms.Leetcode;
 
 namespace DataStructuresAndAlgorithms
 {
@@ -11,7 +11,7 @@ namespace DataStructuresAndAlgorithms
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(LeetCode.Multiply("2", "2"));
+            Console.WriteLine(LeetCode.ThreeSum(new int[] { -1, 0, 1, 2, -1, -4 }));
 
             //Console.WriteLine(LeetCode.SpiralOrder(new int[][] { new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 11, 12 } }));
 
