@@ -32,6 +32,587 @@ namespace DataStructuresAndAlgorithms.Leetcode
     public static partial class LeetCode
     {
         /*
+        567. Permutation in String
+        
+        https://leetcode.com/problems/permutation-in-string/
+
+        Given two strings s1 and s2, return true if s2 contains a
+        permutation
+        of s1, or false otherwise.
+
+        In other words, return true if one of s1's permutations is the substring of s2.
+        */
+        public static bool CheckInclusion(string s1, string s2)
+        {
+            //validations here.
+
+            var s1charCounts = new Dictionary<char, int>();
+            foreach (var chr in s1)
+            {
+                if (s1charCounts.ContainsKey(chr))
+                {
+                    s1charCounts[chr] += 1;
+                    continue;
+                }
+                s1charCounts[chr] = 1;
+            }
+
+            var left = 0;
+            var right = 0;
+
+            var s2charCounts = new Dictionary<char, int>();
+            while (left <= right && right < s2.Length)
+            {
+                var s2char = s2[right];
+                if (s2charCounts.ContainsKey(s2char))
+                {
+                    s2charCounts[s2char] += 1;
+                }
+                else
+                {
+                    s2charCounts.Add(s2char, 1);
+                }
+
+                int length;
+                if (s1charCounts.TryGetValue(s2char, out int s1Count))
+                {
+                    var s2Count = s2charCounts[s2char];
+
+                    while (s2Count > s1Count)
+                    {
+                        if (s2charCounts[s2[left]] > 0)
+                            s2charCounts[s2[left]] -= 1;
+                        left++;
+                        s2Count = s2charCounts[s2char];
+                    }
+
+                    length = right - left + 1;
+                    right++;
+                }
+                else
+                {
+                    s2charCounts.Remove(s2char);
+
+                    while (
+                        left < s2.Length && (left <= right || !s1charCounts.ContainsKey(s2[left]))
+                    )
+                    {
+                        if (s2charCounts.ContainsKey(s2[left]))
+                        {
+                            s2charCounts[s2[left]] -= 1;
+                        }
+                        left++;
+                    }
+
+                    right = left;
+                    length = 0;
+                }
+
+                if (length == s1.Length)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /*
+        424. Longest Repeating Character Replacement
+        
+        https://leetcode.com/problems/longest-repeating-character-replacement/description/
+
+        You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
+
+        Return the length of the longest substring containing the same letter you can get after performing the above operations.
+        */
+        public static int CharacterReplacement(string s, int k)
+        {
+            //validations here.
+
+            var longestLength = 0;
+
+            foreach (var repeatChar in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            {
+                var left = 0;
+                var right = 0;
+                var kCount = k;
+
+                while (left <= right && right < s.Length)
+                {
+                    if (s[right] != repeatChar)
+                    {
+                        if (kCount > 0)
+                        {
+                            //if we can replace a character then do it and move ahead.
+                            kCount -= 1;
+                        }
+                        else
+                        {
+                            while (kCount == 0)
+                            {
+                                while (s[left] == repeatChar)
+                                {
+                                    left++;
+                                }
+                                left++;
+                                kCount += 1;
+                            }
+
+                            kCount -= 1;
+                        }
+                    }
+
+                    var length = right - left + 1;
+
+                    if (length > longestLength)
+                        longestLength = length;
+
+                    right++;
+                }
+            }
+
+            return longestLength;
+        }
+
+        /*
+        3. Longest Substring Without Repeating Characters
+        
+        https://leetcode.com/problems/longest-substring-without-repeating-characters/description/
+
+        Given a string s, find the length of the longest substring without repeating characters.
+        */
+        public static int LengthOfLongestSubstring(string s)
+        {
+            //validations here.
+
+            var seenChars = new HashSet<char>();
+            var left = 0;
+            var right = 0;
+            var longestLength = 0;
+
+            while (left <= right && right < s.Length)
+            {
+                if (seenChars.Contains(s[right]))
+                {
+                    while (s[left] != s[right])
+                    {
+                        seenChars.Remove(s[left]);
+                        left++;
+                    }
+                    seenChars.Remove(s[left]);
+                    left++;
+                }
+
+                seenChars.Add(s[right]);
+
+                var length = right - left + 1;
+
+                if (length > longestLength)
+                    longestLength = length;
+
+                right++;
+            }
+
+            return longestLength;
+        }
+
+        /*
+        33. Search in Rotated Sorted Array
+        
+        https://leetcode.com/problems/search-in-rotated-sorted-array/description/
+
+        There is an integer array nums sorted in ascending order (with distinct values).
+
+        Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k (1 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,5,6,7] might be rotated at pivot index 3 and become [4,5,6,7,0,1,2].
+
+        Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.
+
+        You must write an algorithm with O(log n) runtime complexity.
+        */
+        public static int SearchRotatedArray(int[] nums, int target)
+        {
+            //validations here.
+
+            int Search(int start, int end)
+            {
+                if (start > end)
+                    return -1;
+
+                //rotated sorted arrays have a two portions which are sorted individually.
+                //so we can use binary search on these portions to find target.
+
+                var mid = (start + end) / 2;
+                var midNum = nums[mid];
+
+                if (target == midNum)
+                    return mid;
+
+                if (target < midNum)
+                {
+                    if (midNum > nums[start])
+                    {
+                        if (nums[start] <= target)
+                        {
+                            return Search(start, mid - 1);
+                        }
+                        else
+                        {
+                            return Search(mid + 1, end);
+                        }
+                    }
+                    else
+                    {
+                        if (target <= nums[end])
+                        {
+                            return Search(mid + 1, end);
+                        }
+                        else
+                        {
+                            return Search(start, mid - 1);
+                        }
+                    }
+                }
+                else
+                {
+                    if (midNum > nums[start])
+                    {
+                        return Search(mid + 1, end);
+                    }
+                    else
+                    {
+                        if (target <= nums[end])
+                        {
+                            return Search(mid + 1, end);
+                        }
+                        else
+                        {
+                            return Search(start, mid - 1);
+                        }
+                    }
+                }
+            }
+
+            return Search(0, nums.Length - 1);
+        }
+
+        /*
+        153. Find Minimum in Rotated Sorted Array
+        
+        https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/
+
+        Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7] might become:
+
+            [4,5,6,7,0,1,2] if it was rotated 4 times.
+            [0,1,2,4,5,6,7] if it was rotated 7 times.
+
+        Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
+
+        Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+
+        You must write an algorithm that runs in O(log n) time.
+        */
+        public static int FindMin(int[] nums)
+        {
+            //validations here.
+
+            //rotated sorted array always have two portions that are sorted.
+            //so we can choose where to search by determining if the current middle point is a part of left or right sorted portion.
+
+            var min = int.MaxValue;
+
+            void SetMin(int start, int end)
+            {
+                if (start > end)
+                    return;
+
+                var mid = (start + end) / 2;
+
+                if (nums[mid] < min)
+                    min = nums[mid];
+
+                if (nums[start] <= nums[mid])
+                {
+                    //mid is a part of the right sorted portion.
+
+                    if (nums[start] < min)
+                        min = nums[start];
+
+                    SetMin(mid + 1, end);
+                }
+                else
+                {
+                    SetMin(start, mid - 1);
+                }
+            }
+
+            SetMin(0, nums.Length - 1);
+
+            return min;
+        }
+
+        /*
+        875. Koko Eating Bananas
+        
+        https://leetcode.com/problems/koko-eating-bananas/description/
+
+        Koko loves to eat bananas. There are n piles of bananas, the ith pile has piles[i] bananas. The guards have gone and will come back in h hours.
+
+        Koko can decide her bananas-per-hour eating speed of k. Each hour, she chooses some pile of bananas and eats k bananas from that pile. If the pile has less than k bananas, she eats all of them instead and will not eat any more bananas during this hour.
+
+        Koko likes to eat slowly but still wants to finish eating all the bananas before the guards return.
+
+        Return the minimum integer k such that she can eat all the bananas within h hours.
+        */
+        public static int MinEatingSpeed(int[] piles, int h)
+        {
+            //validations here.
+
+            //max speed for Koko can be max(piles) since she will be able to eat all the piles before h runs out since piles.length < h.
+
+            //so Koko's speed can be in range of 1..max(piles).
+            //to find minimum we can go through these speeds to find which is the minimum speed for which she can eat all piles before h runs out.
+            //to do that, instead of going linearly we can use binary search since speed range is already sorted.
+
+            long maxSpeed = 1;
+            foreach (var pile in piles)
+            {
+                if (pile > maxSpeed)
+                    maxSpeed = pile;
+            }
+
+            long minSpeed = maxSpeed;
+
+            void FindMinSpeed(long start, long end)
+            {
+                if (start > end)
+                    return;
+
+                long speed = (start + end) / 2;
+
+                long time = 0;
+                foreach (var pile in piles)
+                {
+                    time += (int)Math.Ceiling((double)pile / speed);
+                }
+
+                if (time > h)
+                {
+                    FindMinSpeed(speed + 1, end);
+                }
+                else if (time <= h)
+                {
+                    if (speed < minSpeed)
+                        minSpeed = speed;
+
+                    FindMinSpeed(start, speed - 1);
+                }
+            }
+
+            FindMinSpeed(1, maxSpeed);
+
+            return (int)minSpeed;
+        }
+
+        /*
+        74. Search a 2D Matrix
+        
+        https://leetcode.com/problems/search-a-2d-matrix/description/
+
+        You are given an m x n integer matrix matrix with the following two properties:
+
+            Each row is sorted in non-decreasing order.
+            The first integer of each row is greater than the last integer of the previous row.
+
+        Given an integer target, return true if target is in matrix or false otherwise.
+
+        You must write a solution in O(log(m * n)) time complexity.
+        */
+        public static bool SearchMatrix(int[][] matrix, int target)
+        {
+            //validations here.
+
+            //1. find row
+            int[] PotentialRowFor(int start, int end)
+            {
+                if (start > end)
+                    return null;
+                var mid = (start + end) / 2;
+
+                var row = matrix[mid];
+
+                if (row[0] <= target && target <= row[row.Length - 1])
+                    return row;
+
+                if (start == end)
+                    return null;
+
+                if (target < row[0])
+                    return PotentialRowFor(start, mid - 1);
+                return PotentialRowFor(mid + 1, end);
+            }
+
+            var row = PotentialRowFor(0, matrix.Length - 1);
+            if (row == null)
+                return false;
+
+            //2. search in row.
+            bool BinSearch(int start, int end)
+            {
+                if (start > end)
+                    return false;
+
+                var mid = (start + end) / 2;
+
+                if (target == row[mid])
+                    return true;
+
+                if (target > row[mid])
+                    return BinSearch(mid + 1, end);
+                return BinSearch(start, mid - 1);
+            }
+
+            return BinSearch(0, row.Length - 1);
+        }
+
+        /*
+        853. Car Fleet
+        
+        https://leetcode.com/problems/car-fleet/description/
+
+        There are n cars at given miles away from the starting mile 0, traveling to reach the mile target.
+
+        You are given two integer array position and speed, both of length n, where position[i] is the starting mile of the ith car and speed[i] is the speed of the ith car in miles per hour.
+
+        A car cannot pass another car, but it can catch up and then travel next to it at the speed of the slower car.
+
+        A car fleet is a car or cars driving next to each other. The speed of the car fleet is the minimum speed of any car in the fleet.
+
+        If a car catches up to a car fleet at the mile target, it will still be considered as part of the car fleet.
+
+        Return the number of car fleets that will arrive at the destination.
+        */
+        public static int CarFleet(int target, int[] position, int[] speed)
+        {
+            //validations here.
+
+            //cars travel on a single lane. they cannot pass each other.
+            // []______[]__________[]
+            //they catch upto each other. similar to next greatest temperature.
+            //so using stack.
+
+            var stack = new Stack<(int, int)>();
+            var cars = new (int pos, int spd)[position.Length];
+
+            foreach (var (pos, idx) in position.Select((pos, idx) => (pos, idx)))
+            {
+                cars[idx] = (pos, speed[idx]);
+            }
+
+            //sort cars by their position so we can have them in initial position.
+            Array.Sort(cars, (a, b) => a.pos.CompareTo(b.pos));
+
+            float TimeFor((int pos, int spd) car)
+            {
+                return (float)(target - car.pos) / car.spd;
+            }
+
+            for (var idx = cars.Length - 1; idx > -1; idx--)
+            {
+                var car = cars[idx];
+
+                if (stack.Count > 0)
+                {
+                    var frontCar = stack.Peek();
+                    if (TimeFor(frontCar) < TimeFor(car))
+                    {
+                        stack.Push(car);
+                    }
+                }
+                else
+                {
+                    stack.Push(car);
+                }
+            }
+
+            return stack.Count;
+        }
+
+        /*
+        739. Daily Temperatures
+        
+        https://leetcode.com/problems/daily-temperatures/description/
+
+        Given an array of integers temperatures represents the daily temperatures, return an array answer such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature. If there is no future day for which this is possible, keep answer[i] == 0 instead.
+        */
+        public static int[] DailyTemperatures(int[] temperatures)
+        {
+            //validations here.
+
+            var answers = new int[temperatures.Length];
+            Array.Fill(answers, 0);
+
+            var stack = new Stack<(int, int)>();
+
+            foreach (var (temp, idx) in temperatures.Select((temp, idx) => (temp, idx)))
+            {
+                while (stack.Count > 0 && temp > stack.Peek().Item1)
+                {
+                    var values = stack.Pop();
+
+                    answers[values.Item2] = idx - values.Item2;
+                }
+
+                stack.Push((temp, idx));
+            }
+
+            return answers;
+        }
+
+        /*
+        496. Next Greater Element I
+        
+        https://leetcode.com/problems/next-greater-element-i/description/
+
+        The next greater element of some element x in an array is the first greater element that is to the right of x in the same array.
+
+        You are given two distinct 0-indexed integer arrays nums1 and nums2, where nums1 is a subset of nums2.
+
+        For each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2. If there is no next greater element, then the answer for this query is -1.
+
+        Return an array ans of length nums1.length such that ans[i] is the next greater element as described above.
+        */
+        public static int[] NextGreaterElement(int[] nums1, int[] nums2)
+        {
+            //validations here.
+
+            var result = new int[nums1.Length];
+            Array.Fill(result, -1);
+
+            var idxMap = new Dictionary<int, int>();
+            for (var idx = 0; idx < nums1.Length; idx++)
+            {
+                //able to do this because nums1 has unique elements.
+                idxMap.Add(nums1[idx], idx);
+            }
+
+            var stack = new Stack<int>();
+            foreach (var num in nums2)
+            {
+                //check if num is next greatest neighbor of stack top
+                while (stack.Count > 0 && num > stack.Peek())
+                {
+                    var value = stack.Pop();
+
+                    result[idxMap[value]] = num;
+                }
+
+                if (idxMap.ContainsKey(num))
+                    stack.Push(num);
+            }
+
+            return result;
+        }
+
+        /*
         22. Generate Parentheses
         
         https://leetcode.com/problems/generate-parentheses/description/
@@ -1252,7 +1833,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //424. Longest Repeating Character Replacement
         //You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
         //Return the length of the longest substring containing the same letter you can get after performing the above operations.
-        public static int CharacterReplacement(string s, int k)
+        public static int CharacterReplacementNotWorking(string s, int k)
         {
             var maxLength = int.MinValue;
 
