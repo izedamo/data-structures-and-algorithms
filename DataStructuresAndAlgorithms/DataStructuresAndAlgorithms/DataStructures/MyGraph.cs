@@ -22,7 +22,10 @@ namespace DataStructuresAndAlgorithms.DataStructures
         public void AddNode(int node)
         {
             if (adjacencyList.ContainsKey(node))
-                throw new ArgumentException($"{node} node already exists in the graph.", nameof(node));
+                throw new ArgumentException(
+                    $"{node} node already exists in the graph.",
+                    nameof(node)
+                );
 
             adjacencyList.Add(node, new HashSet<int>());
         }
@@ -38,7 +41,7 @@ namespace DataStructuresAndAlgorithms.DataStructures
         public string GetConnections()
         {
             var connectionsStringBuilder = new StringBuilder();
-            foreach(var kv in adjacencyList)
+            foreach (var kv in adjacencyList)
             {
                 connectionsStringBuilder
                     .Append(kv.Key)
@@ -53,7 +56,7 @@ namespace DataStructuresAndAlgorithms.DataStructures
         {
             adjacencyList.Remove(node);
 
-            foreach(var kv in adjacencyList)
+            foreach (var kv in adjacencyList)
             {
                 kv.Value.Remove(node);
             }
@@ -61,7 +64,7 @@ namespace DataStructuresAndAlgorithms.DataStructures
 
         private void AddNodesIfNotExists(params int[] nodes)
         {
-            foreach(var node in nodes)
+            foreach (var node in nodes)
             {
                 if (adjacencyList.ContainsKey(node))
                     continue;

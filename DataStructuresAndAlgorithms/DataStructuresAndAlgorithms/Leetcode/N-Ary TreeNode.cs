@@ -6,20 +6,19 @@ using System.Threading.Tasks;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
-    public class Node
+    public class NAryNode
     {
         public int val;
-        public IList<Node> children;
+        public IList<NAryNode> children;
 
-        public Node()
-        { }
+        public NAryNode() { }
 
-        public Node(int _val)
+        public NAryNode(int _val)
         {
             val = _val;
         }
 
-        public Node(int _val, IList<Node> _children)
+        public NAryNode(int _val, IList<NAryNode> _children)
         {
             val = _val;
             children = _children;

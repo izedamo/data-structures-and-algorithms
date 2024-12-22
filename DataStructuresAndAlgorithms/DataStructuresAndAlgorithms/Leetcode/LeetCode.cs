@@ -17,7 +17,9 @@ using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.Intrinsics.Arm;
 using System.Security;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading;
 using System.Timers;
@@ -31,6 +33,746 @@ namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        /*
+        572. Subtree of Another Tree
+        
+        https://leetcode.com/problems/subtree-of-another-tree/description/
+
+        Given the roots of two binary trees root and subRoot, return true if there is a subtree of root with the same structure and node values of subRoot and false otherwise.
+
+        A subtree of a binary tree tree is a tree that consists of a node in tree and all of this node's descendants. The tree tree could also be considered as a subtree of itself.
+        */
+        public static bool IsSubtree(TreeNode root, TreeNode subRoot)
+        {
+            //validations here.
+
+            bool AreSame(TreeNode r1, TreeNode r2)
+            {
+                if (r1 == null && r2 == null)
+                    return true;
+
+                return r1?.val == r2?.val
+                    && AreSame(r1?.right, r2?.right)
+                    && AreSame(r1?.left, r2?.left);
+            }
+
+            bool HasSubtree(TreeNode node)
+            {
+                if (node == null)
+                    return false;
+
+                if (AreSame(node, subRoot))
+                    return true;
+
+                return HasSubtree(node?.right) || HasSubtree(node?.left);
+            }
+
+            return HasSubtree(root);
+        }
+
+        /*
+        100. Same Tree
+        
+        https://leetcode.com/problems/same-tree/description/
+
+        Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+
+        Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+        */
+        public static bool IsSameTree(TreeNode p, TreeNode q)
+        {
+            //validations here.
+
+            //uses DFS.
+            static bool AreSame(TreeNode r1, TreeNode r2)
+            {
+                if (r1 == null && r2 == null)
+                    return true;
+                return r1?.val == r2?.val
+                    && AreSame(r1?.right, r2?.right)
+                    && AreSame(r1?.left, r2?.left);
+            }
+
+            return AreSame(p, q);
+        }
+
+        /*
+        110. Balanced Binary Tree
+        
+        https://leetcode.com/problems/balanced-binary-tree/description/
+
+        Given a binary tree, determine if it is height-balanced.
+        A height-balanced binary tree is a binary tree in which the depth of the two subtrees of every node never differs by more than one.
+
+        */
+        public static bool IsBalanced(TreeNode root)
+        {
+            //validations here.
+
+            // int HeightFor(TreeNode node)
+            // {
+            //     if (node == null)
+            //         return 0;
+
+            //     var rh = HeightFor(node.right);
+            //     var lh = HeightFor(node.left);
+
+            //     return 1 + Math.Max(rh, lh);
+            // }
+
+            (bool, int) IsBalanced(TreeNode node)
+            {
+                if (node == null)
+                    return (true, 0);
+
+                var (rs, rh) = IsBalanced(node.right);
+                var (ls, lh) = IsBalanced(node.left);
+
+                if (Math.Abs(rh - lh) > 1)
+                    return (false, 1 + Math.Max(rh, lh));
+
+                return (rs && ls, 1 + Math.Max(rh, lh));
+            }
+
+            return IsBalanced(root).Item1;
+        }
+
+        /*
+        543. Diameter of Binary Tree
+        
+        https://leetcode.com/problems/diameter-of-binary-tree/
+
+        Given the root of a binary tree, return the length of the diameter of the tree.
+
+        The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root.
+
+        The length of a path between two nodes is represented by the number of edges between them.
+        */
+        public static int DiameterOfBinaryTree(TreeNode root)
+        {
+            //validations here.
+
+            //Maths of this problem makes it tricky.
+            //Basically we need to calculate the formula for the diameter at a given node. And assume the diameter of a null node to be -1.
+            if (root == null)
+                return 0;
+            if (root.left == null && root.right == null)
+                return 0;
+
+            var maxDiameter = 0;
+
+            (int, int) DiameterAndHeightFor(TreeNode node)
+            {
+                if (node == null)
+                    return (0, -1);
+
+                var (rd, rh) = DiameterAndHeightFor(node.right);
+                if (rd > maxDiameter)
+                    maxDiameter = rd;
+
+                var (ld, lh) = DiameterAndHeightFor(node.left);
+                if (ld > maxDiameter)
+                    maxDiameter = ld;
+
+                var d = rh + lh + 2; // diameter of a node.
+
+                return (d, 1 + Math.Max(rh, lh));
+            }
+
+            var (rd, rh) = DiameterAndHeightFor(root);
+            if (rd > maxDiameter)
+                maxDiameter = rd;
+
+            return maxDiameter;
+        }
+
+        /*
+        104. Maximum Depth of Binary Tree
+        
+        https://leetcode.com/problems/maximum-depth-of-binary-tree/description/
+
+        Given the root of a binary tree, return its maximum depth.
+
+        A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+        */
+        public static int MaxDepth(TreeNode root)
+        {
+            //validations here.
+
+            var maxDepth = 0;
+
+            var nodes = new Stack<(TreeNode, int)>();
+
+            if (root != null)
+                nodes.Push((root, 1));
+
+            while (nodes.Count > 0)
+            {
+                var (node, depth) = nodes.Pop();
+
+                if (depth > maxDepth)
+                    maxDepth = depth;
+
+                if (node.left != null)
+                    nodes.Push((node.left, depth + 1));
+
+                if (node.right != null)
+                    nodes.Push((node.right, depth + 1));
+            }
+
+            return maxDepth;
+        }
+
+        /*
+        226. Invert Binary Tree
+        
+        https://leetcode.com/problems/invert-binary-tree/description/
+
+        Given the root of a binary tree, invert the tree, and return its root.
+
+        //Recursive solution.
+        */
+        public static TreeNode InvertTree(TreeNode root)
+        {
+            //validations here.
+
+            void InvertTree(TreeNode node)
+            {
+                if (node == null)
+                    return;
+
+                InvertTree(node.left);
+                InvertTree(node.right);
+
+                var temp = node.left;
+                node.left = node.right;
+                node.right = temp;
+            }
+
+            InvertTree(root);
+
+            return root;
+        }
+
+        public static TreeNode InvertTreeQueue(TreeNode root)
+        {
+            //validations here.
+
+            var nodes = new Queue<TreeNode>();
+            nodes.Enqueue(root);
+
+            while (nodes.Count > 0)
+            {
+                var node = nodes.Dequeue();
+
+                if (node.left != null)
+                    nodes.Enqueue(node.left);
+
+                if (node.right != null)
+                    nodes.Enqueue(node.right);
+
+                (node.left, node.right) = (node.right, node.left);
+            }
+
+            return root;
+        }
+
+        /*
+        42. Trapping Rain Water
+        
+        https://leetcode.com/problems/trapping-rain-water/description/
+
+        Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+        */
+        public static int Trap(int[] height)
+        {
+            //validations here.
+
+            if (height.Length == 1 || height.Length == 2)
+                return 0;
+
+            /*
+            Approach:
+            Find the window where water can collect.
+            Find the blocked area in the window.
+            Find the total area of window.
+            Water area = total - blocked.
+            */
+
+            var waterArea = 0;
+            var left = 0;
+            var totalArea = 0;
+            var blockedArea = 0;
+            for (var right = 0; right < height.Length; right++)
+            {
+                if (height[right] >= height[left])
+                {
+                    var h = Math.Min(height[left], height[right]);
+                    var l = Math.Max(right - left - 1, 0);
+                    totalArea = h * l;
+                    waterArea += totalArea - blockedArea;
+                    blockedArea = 0;
+
+                    left = right;
+                }
+                else
+                {
+                    blockedArea += height[right] * 1;
+                }
+            }
+
+            var limit = left;
+
+            left = height.Length - 1;
+            totalArea = 0;
+            blockedArea = 0;
+            for (var right = left; right <= limit; right--)
+            {
+                if (height[right] >= height[left])
+                {
+                    var h = Math.Min(height[left], height[right]);
+                    var l = Math.Max(right - left - 1, 0);
+                    totalArea = h * l;
+                    waterArea += totalArea - blockedArea;
+                    blockedArea = 0;
+
+                    left = right;
+                }
+                else
+                {
+                    blockedArea += height[right] * 1;
+                }
+            }
+
+            return waterArea;
+        }
+
+        /*
+        287. Find the Duplicate Number
+        
+        https://leetcode.com/problems/find-the-duplicate-number/description/
+
+        Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive.
+
+        There is only one repeated number in nums, return this repeated number.
+
+        You must solve the problem without modifying the array nums and using only constant extra space.
+        */
+        public static int FindDuplicate(int[] nums)
+        {
+            //validations here.
+
+            /*
+            this problem is of a very specific type.
+            it uses an algo called floyd's algo.
+            the algo is: distance from start of linked list to a cycle start = distance from slow and fast pointer crossing to cycle start.
+            */
+
+            var slow = 0;
+            var fast = 0;
+
+            while (true)
+            {
+                fast = nums[nums[fast]];
+                slow = nums[slow];
+
+                if (slow == fast)
+                    break;
+            }
+
+            var slow2 = 0;
+
+            while (true)
+            {
+                if (slow == slow2)
+                    break;
+
+                slow = nums[slow];
+                slow2 = nums[slow2];
+            }
+
+            return slow;
+        }
+
+        /*
+        2. Add Two Numbers
+        
+        https://leetcode.com/problems/add-two-numbers/description/
+
+        You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+
+        You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+        */
+        public static ListNode AddTwoNumbers(ListNode l1, ListNode l2)
+        {
+            //validations here.
+
+            ListNode prev = null;
+            ListNode sum = null;
+            ListNode sumHead = null;
+
+            int carry = 0;
+
+            while (l1 != null && l2 != null)
+            {
+                var val = carry + l1.val + l2.val;
+
+                sum = new ListNode(val % 10);
+
+                if (prev != null)
+                    prev.next = sum;
+
+                if (sumHead == null)
+                    sumHead = sum;
+
+                prev = sum;
+                carry = val / 10;
+                l1 = l1.next;
+                l2 = l2.next;
+            }
+
+            if (l1 != null)
+                AddRemainingNodes(l1, ref prev, ref sum, ref carry);
+
+            if (l2 != null)
+                AddRemainingNodes(l2, ref prev, ref sum, ref carry);
+
+            if (carry != 0)
+            {
+                sum = new ListNode(carry);
+                prev.next = sum;
+            }
+
+            static void AddRemainingNodes(
+                ListNode node,
+                ref ListNode prev,
+                ref ListNode sum,
+                ref int carry
+            )
+            {
+                while (node != null)
+                {
+                    var val = carry + node.val;
+
+                    sum = new ListNode(val % 10);
+                    prev.next = sum;
+                    prev = sum;
+
+                    carry = val / 10;
+                    node = node.next;
+                }
+            }
+
+            return sumHead;
+        }
+
+        /*
+        141. Linked List Cycle
+        
+        https://leetcode.com/problems/linked-list-cycle/description/
+
+        Given head, the head of a linked list, determine if the linked list has a cycle in it.
+
+        There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+
+        Return true if there is a cycle in the linked list. Otherwise, return false.
+        */
+        public static bool HasCycle(ListNode head)
+        {
+            //validations here.
+
+            if (head == null)
+                return false;
+            var slow = head;
+            var fast = head.next;
+            var hasCycle = false;
+
+            while (!hasCycle && fast != null)
+            {
+                if (slow == fast)
+                    hasCycle = true;
+
+                slow = slow.next;
+                fast = fast.next?.next;
+            }
+
+            return hasCycle;
+        }
+
+        /*
+        138. Copy List with Random Pointer
+        
+        https://leetcode.com/problems/copy-list-with-random-pointer/description/
+
+        A linked list of length n is given such that each node contains an additional random pointer, which could point to any node in the list, or null.
+
+        Construct a deep copy of the list. The deep copy should consist of exactly n brand new nodes, where each new node has its value set to the value of its corresponding original node. Both the next and random pointer of the new nodes should point to new nodes in the copied list such that the pointers in the original list and copied list represent the same list state. None of the pointers in the new list should point to nodes in the original list.
+
+        For example, if there are two nodes X and Y in the original list, where X.random --> Y, then for the corresponding two nodes x and y in the copied list, x.random --> y.
+
+        Return the head of the copied linked list.
+
+        The linked list is represented in the input/output as a list of n nodes. Each node is represented as a pair of [val, random_index] where:
+
+            val: an integer representing Node.val
+            random_index: the index of the node (range from 0 to n-1) that the random pointer points to, or null if it does not point to any node.
+
+        Your code will only be given the head of the original linked list.
+        */
+        public static Node CopyRandomList(Node head)
+        {
+            //validations here.
+
+            var current = head;
+            Node prev = null;
+            Node newHead = null;
+            var map = new Dictionary<Node, Node>();
+
+            while (current != null)
+            {
+                var node = new Node(current.val);
+
+                if (current == head)
+                {
+                    newHead = node;
+                }
+                else
+                {
+                    prev.next = node;
+                }
+
+                map.Add(current, node);
+
+                prev = current;
+                current = current.next;
+            }
+
+            var old = head;
+            var copy = newHead;
+
+            while (old != null)
+            {
+                if (old.random == null)
+                    copy.random = null;
+                else
+                    copy.random = map[old.random];
+
+                old = old.next;
+                copy = copy.next;
+            }
+
+            return newHead;
+        }
+
+        /*
+        19. Remove Nth Node From End of List
+        
+        https://leetcode.com/problems/remove-nth-node-from-end-of-list/description/
+
+        Given the head of a linked list, remove the nth node from the end of the list and return its head.
+        */
+        public static ListNode RemoveNthFromEnd(ListNode head, int n)
+        {
+            // T = O(n), S = O(n)
+
+            //validations here.
+
+            //doing it in one pass.
+            //push nodes onto stack (LIFO) and find nth node from top using pop and then remove it.
+            //take care of edge cases (single node list, node to remove = head node).
+
+            var current = head;
+            var stack = new Stack<ListNode>();
+            while (current != null)
+            {
+                stack.Push(current);
+                current = current.next;
+            }
+
+            ListNode nodeToRemove = null;
+            while (n > 0)
+            {
+                nodeToRemove = stack.Pop();
+                n--;
+            }
+
+            if (stack.TryPop(out var prev))
+            {
+                //node is not head node.
+
+                prev.next = nodeToRemove.next;
+            }
+            else
+            {
+                //node is head node.
+
+                head = head.next;
+            }
+
+            nodeToRemove.next = null;
+
+            return head;
+        }
+
+        public static ListNode RemoveNthFromEnd2(ListNode head, int n)
+        {
+            // T = O(n), S = O(1)
+
+            //validations here.
+
+            /*
+            2 pointer approach works by having 2 pointers traverse the linked list at different speeds/distances and so they are at different nodes at any point in time.
+            If we set the distance between the nodes equal to n then when the first pointer reaches the list end then the second would be n-1 nodes away from the end and would be the nth node.
+            */
+
+            ListNode prev = null;
+            ListNode nodeToRemove = head;
+            ListNode rightNode = null;
+
+            while (n > 0)
+            {
+                n--;
+
+                if (rightNode == null)
+                    rightNode = head;
+                else
+                    rightNode = rightNode.next;
+            }
+
+            while (rightNode.next != null)
+            {
+                rightNode = rightNode.next;
+                prev = nodeToRemove;
+                nodeToRemove = nodeToRemove.next;
+            }
+
+            if (prev == null)
+                head = head.next;
+            else if (nodeToRemove == null)
+            {
+                head = null;
+            }
+            else
+            {
+                prev.next = nodeToRemove.next;
+                nodeToRemove.next = null;
+            }
+
+            return head;
+        }
+
+        /*
+        143. Reorder List
+        
+        https://leetcode.com/problems/reorder-list/description/
+
+        You are given the head of a singly linked-list. The list can be represented as:
+
+        L0 → L1 → … → Ln - 1 → Ln
+
+        Reorder the list to be on the following form:
+
+        L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+
+        You may not modify the values in the list's nodes. Only nodes themselves may be changed.
+        */
+        // T = O(n), S = O(n)
+        public static void ReorderList(ListNode head)
+        {
+            //validations here.
+
+            //add list nodes to list.
+            var nodes = new List<ListNode>();
+            var current = head;
+            while (current != null)
+            {
+                nodes.Add(current);
+
+                current = current.next;
+            }
+
+            var left = 0;
+            var right = nodes.Count - 1;
+
+            while (left < right)
+            {
+                if (left != right)
+                {
+                    nodes[left].next = nodes[right];
+                    left += 1;
+                }
+                if (right != left)
+                {
+                    nodes[right].next = nodes[left];
+                    right -= 1;
+                }
+            }
+
+            nodes[right].next = null;
+        }
+
+        // T = O(n), S = O(1)
+        public static void ReorderList2(ListNode head)
+        {
+            //validations here.
+
+            /*
+            This approach breaks down the problem into 3 steps.
+                1. Find the mid of the list.
+                2. Reverse the second half of the list.
+                3. Merge the two halves.
+            */
+
+            // 1. find mid of list.
+            var slow = head;
+            var fast = head.next;
+
+            while (fast != null)
+            {
+                // slow = slow.next;
+                fast = fast.next;
+                if (fast == null)
+                {
+                    continue;
+                }
+                else
+                    fast = fast.next;
+                slow = slow.next;
+            }
+
+            // 2. reverse the second half.
+            ListNode revHead = null;
+            ListNode prev = null;
+            var current = slow.next;
+
+            while (current != null)
+            {
+                var temp = current.next;
+                revHead = current;
+                revHead.next = prev;
+                prev = revHead;
+                current = temp;
+            }
+
+            // 3. merge the two halves.
+            var left = head;
+            var right = revHead;
+
+            while (right != null)
+            {
+                var rTemp = right.next;
+                var lTemp = left.next;
+
+                left.next = right;
+                left = lTemp;
+
+                right.next = left;
+                right = rTemp;
+            }
+
+            left.next = null;
+        }
+
         /*
         567. Permutation in String
         
@@ -2332,14 +3074,14 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Nary-Tree input serialization is represented in their level order traversal.Each group of children is separated by the null value. See example:
         //Input: root = [1,null,3,2,4,null,5,6]
         //Output: [1,3,5,6,2,4]
-        public static IList<int> PreorderIterative(Node root)
+        public static IList<int> PreorderIterative(NAryNode root)
         {
             var preOrderList = new List<int>();
 
             if (root == null)
                 return preOrderList;
 
-            var nodes = new Stack<Node>();
+            var nodes = new Stack<NAryNode>();
             nodes.Push(root);
 
             while (nodes.Count > 0)
@@ -2362,14 +3104,14 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Nary-Tree input serialization is represented in their level order traversal.Each group of children is separated by the null value. See example:
         //Input: root = [1,null,3,2,4,null,5,6]
         //Output: [1,3,5,6,2,4]
-        public static IList<int> PreorderRecursive(Node root)
+        public static IList<int> PreorderRecursive(NAryNode root)
         {
             var preOrderList = new List<int>();
 
             if (root == null)
                 return preOrderList;
 
-            void recursivePreOrder(Node node, IList<int> nodes)
+            void recursivePreOrder(NAryNode node, IList<int> nodes)
             {
                 if (node == null)
                     return;
@@ -2612,10 +3354,9 @@ namespace DataStructuresAndAlgorithms.Leetcode
 
             ListNode head = null;
             ListNode prev = null;
-            ListNode smaller = null;
-
             while (list1 != null && list2 != null)
             {
+                ListNode smaller;
                 if (list1.val > list2.val)
                 {
                     smaller = list2;
@@ -2786,7 +3527,27 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum. A subarray is a contiguous part of an array.
         public static int MaxSubArray(int[] nums)
         {
-            return 0;
+            //validations here.
+
+            /*
+            
+            Kadane's algorithm - used to solve for maximum contiguous subarray.
+            It uses 2 conditions that a maximum subarray needs to have.
+            1. The maximum subarray cannot have a starting negative sum. If it does, then it must be removed and the new subsequence has a sum greater than the previous and is the max subarray.
+            2. After dropping the negative sum the subsequence must start non-negatively so including it in sum increases the sum. Thus, an optimal subsequence must start immediately after the elimination of starting sub-subsequences with negative sums.
+            
+            */
+
+            var maxSum = int.MinValue;
+            var currentSum = int.MinValue;
+
+            for (var idx = 0; idx < nums.Length; idx++)
+            {
+                currentSum = nums[idx] + Math.Max(0, currentSum);
+                maxSum = Math.Max(currentSum, maxSum);
+            }
+
+            return maxSum;
         }
 
         //Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements. Note that you must do this in-place without making a copy of the array.

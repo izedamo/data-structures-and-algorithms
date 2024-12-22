@@ -1,0 +1,1 @@
+You have data being received by your system from an IOT device. Design a system that returns median value of data returned in the past 5 min. Make any reasonable assumptions.  Design the APIs/classes,data structures,etc
