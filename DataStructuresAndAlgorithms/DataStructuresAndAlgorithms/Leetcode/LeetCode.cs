@@ -1,38 +1,244 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Data.SqlTypes;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Net.WebSockets;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.Intrinsics.Arm;
-using System.Security;
-using System.Security.AccessControl;
 using System.Text;
-using System.Threading;
-using System.Timers;
-using System.Transactions;
-using System.Xml.Linq;
-using System.Xml.Schema;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Reflection.Metadata.BlobBuilder;
 
 namespace DataStructuresAndAlgorithms.Leetcode
 {
     public static partial class LeetCode
     {
+        /*
+        199. Binary Tree Right Side View
+        
+        https://leetcode.com/problems/binary-tree-right-side-view/description/
+
+        Given the root of a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+        */
+        public static IList<int> RightSideView(TreeNode root)
+        {
+            //validations here.
+
+            if (root == null)
+                return new List<int>();
+
+            var rightSideView = new List<int>();
+
+            var levels = new Queue<IList<TreeNode>>();
+            levels.Enqueue(new List<TreeNode> { root });
+
+            while (levels.Count > 0)
+            {
+                var level = levels.Dequeue();
+
+                rightSideView.Add(level[0].val);
+
+                var nextLevel = new List<TreeNode>();
+                foreach (var node in level)
+                {
+                    if (node.right != null)
+                        nextLevel.Add(node.right);
+
+                    if (node.left != null)
+                        nextLevel.Add(node.left);
+                }
+
+                if (nextLevel.Count > 0)
+                    levels.Enqueue(nextLevel);
+            }
+
+            return rightSideView;
+        }
+
+        /*
+        107. Binary Tree Level Order Traversal II
+        
+        https://leetcode.com/problems/binary-tree-level-order-traversal-ii/description/
+
+        Given the root of a binary tree, return the bottom-up level order traversal of its nodes' values. (i.e., from left to right, level by level from leaf to root).
+        */
+        public static IList<IList<int>> LevelOrderBottom(TreeNode root)
+        {
+            //validations here.
+
+            if (root == null)
+                return new List<IList<int>> { };
+
+            var levels = new Stack<IList<TreeNode>>();
+            var level = new List<TreeNode> { root };
+
+            while (level.Count > 0)
+            {
+                levels.Push(level);
+
+                var nextLevel = new List<TreeNode>();
+
+                foreach (var node in level)
+                {
+                    if (node.left != null)
+                        nextLevel.Add(node.left);
+
+                    if (node.right != null)
+                        nextLevel.Add(node.right);
+                }
+
+                level = nextLevel;
+            }
+
+            var levelValues = new List<IList<int>>();
+            while (levels.Count > 0)
+            {
+                level = (List<TreeNode>)levels.Pop();
+
+                var levelValue = new List<int>();
+                foreach (var node in level)
+                {
+                    levelValue.Add(node.val);
+                }
+
+                levelValues.Add(levelValue);
+            }
+
+            return levelValues;
+        }
+
+        /*
+        102. Binary Tree Level Order Traversal
+
+        Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+        */
+        public static IList<IList<int>> LevelOrderAgain(TreeNode root)
+        {
+            //validations here.
+
+            if (root == null)
+                return new List<IList<int>> { new List<int> { } };
+
+            var levels = new List<IList<int>>();
+
+            var levelNodes = new Queue<List<TreeNode>>();
+            levelNodes.Enqueue(new List<TreeNode> { root });
+
+            while (levelNodes.Count > 0)
+            {
+                var nodes = levelNodes.Dequeue();
+                var nextLevel = new List<TreeNode>();
+
+                var nodeValues = new List<int>();
+                foreach (var node in nodes)
+                {
+                    nodeValues.Add(node.val);
+
+                    if (node.left != null)
+                        nextLevel.Add(node.left);
+                    if (node.right != null)
+                        nextLevel.Add(node.right);
+                }
+
+                if (nextLevel.Count > 0)
+                    levelNodes.Enqueue(nextLevel);
+
+                if (nodeValues.Count > 0)
+                    levels.Add(nodeValues);
+            }
+
+            return levels;
+        }
+
+        /*
+        236. Lowest Common Ancestor of a Binary Tree
+
+        Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+        According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+        */
+        public static TreeNode LowestCommonAncestorBT(TreeNode root, TreeNode p, TreeNode q)
+        {
+            //validations here.
+
+            (bool, HashSet<int?>, TreeNode) lca(TreeNode node)
+            {
+                if (node == null || (node.right == null && node.left == null))
+                    return (false, new HashSet<int?> { node?.val }, node);
+
+                (bool, HashSet<int?>, TreeNode) left = lca(node.left);
+                if (left.Item1)
+                    return left;
+
+                var right = lca(node.right);
+                if (right.Item1)
+                    return right;
+
+                var values = left.Item2;
+                values.UnionWith(right.Item2);
+                values.Add(node.val);
+
+                if (values.Contains(p.val) && values.Contains(q.val))
+                    return (true, values, node);
+
+                return (false, values, node);
+            }
+
+            return lca(root).Item3;
+        }
+
+        /*
+        4. Median of Two Sorted Arrays
+        
+        https://leetcode.com/problems/median-of-two-sorted-arrays/description/
+
+        Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
+
+        The overall run time complexity should be O(log (m+n)).
+        */
+        public static double FindMedianSortedArrays(int[] nums1, int[] nums2)
+        {
+            // T = O(log(min(m, n)))
+            //validations here.
+
+            var totalLength = nums1.Length + nums2.Length;
+            var half = totalLength / 2;
+
+            if (nums1.Length > nums2.Length)
+                (nums1, nums2) = (nums2, nums1);
+
+            var left = 0;
+            var right = nums1.Length - 1;
+
+            while (true)
+            {
+                var idxA = (int)Math.Floor((double)(left + right) / 2);
+                var idxB = Math.Max(half - (idxA + 1) - 1, -1);
+
+                var aLeft = idxA >= 0 ? nums1[idxA] : int.MinValue;
+                var aRight = idxA + 1 < nums1.Length ? nums1[idxA + 1] : int.MaxValue;
+                var bLeft = idxB >= 0 ? nums2[idxB] : int.MinValue;
+                var bRight = idxB + 1 < nums2.Length ? nums2[idxB + 1] : int.MaxValue;
+
+                // partition is correct.
+                if (aLeft <= bRight && bLeft <= aRight)
+                {
+                    // median for odd length.
+                    if (totalLength % 2 != 0)
+                    {
+                        return Math.Min(aRight, bRight);
+                    }
+
+                    // median for even length.
+                    return ((double)Math.Max(aLeft, bLeft) + Math.Min(aRight, bRight)) / 2;
+                }
+                else if (aLeft > bRight)
+                {
+                    right = idxA - 1;
+                }
+                else
+                {
+                    left = idxA + 1;
+                }
+            }
+        }
+
         /*
         572. Subtree of Another Tree
         
@@ -2958,7 +3164,7 @@ namespace DataStructuresAndAlgorithms.Leetcode
         //235. Lowest Common Ancestor of a Binary Search Tree
         //Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.
         //According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants(where we allow a node to be a descendant of itself).”
-        public static TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q)
+        public static TreeNode LowestCommonAncestorBST(TreeNode root, TreeNode p, TreeNode q)
         {
             TreeNode lca(TreeNode node)
             {

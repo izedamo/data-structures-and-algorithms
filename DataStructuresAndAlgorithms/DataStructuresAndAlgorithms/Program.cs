@@ -24,7 +24,7 @@ namespace DataStructuresAndAlgorithms
                 }
             */
 
-            Console.WriteLine(LeetCode.Trap(new int[] { 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1 }));
+            Console.WriteLine(LeetCode.FindMedianSortedArrays(new int[] { 1, 3 }, new int[] { 2 }));
 
             //Console.WriteLine(LeetCode.SpiralOrder(new int[][] { new int[] { 1, 2, 3, 4 }, new int[] { 5, 6, 7, 8 }, new int[] { 9, 10, 11, 12 } }));
 
